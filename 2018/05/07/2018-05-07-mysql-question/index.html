@@ -1,0 +1,671 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
+  <meta name="author" content="niaobulashi">
+  <meta name="keywords" content="个人博客, 鸟不拉屎, Java, 个人博客, 鸟不拉诗">
+  
+  <title>mysql数据库开发常见问题及优化 - 鸟不拉诗</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/bg.svg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="mysql数据库开发常见问题及优化">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-05-07 00:00" pubdate>
+        2018年5月7日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      21
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">mysql数据库开发常见问题及优化</h1>
+            
+            <div class="markdown-body">
+              <blockquote>
+<p>mysql 数据库是被广泛应用的关系型数据库，其体积小、支持多处理器、开源并免费的特性使其在<br>Internet 中小型网站中的使用率尤其高。在使用 mysql 的过程中不规范的 SQL 编写、非最优的策略选择都可能导致系统性能甚至功能上的缺陷。</p>
+</blockquote>
+<p>开发过程中 mysql 数据库设计及使用的常见问题，并提出相关优化方案。进行了一次小结，结合自己的工作经历及理解形成此文以供分享，希望能有助于各位同行解决工作中的相关问题。<br>本文将就以下三个问题进行展开：</p>
+<ol>
+<li>库表设计</li>
+<li>慢SQL 问题</li>
+<li>误操作、程序 bug 时怎么办</li>
+</ol>
+<h2 id="库表设计"><a href="#库表设计" class="headerlink" title="库表设计"></a>库表设计</h2><h4 id="引擎选择"><a href="#引擎选择" class="headerlink" title="引擎选择"></a>引擎选择</h4><p>在 mysql 5.1 中，引入了新的插件式存储引擎体系结构，允许将存储引擎加载到正在运新的 mysql 服务器中。使用 mysql 插件式存储引擎体系结构，允许数据库专业人员或者设计库表的软件开发人员为特定的应用需求选择专门的存储引擎，完全不需要管理任何特殊的应用编码要求，也无需考虑所有的底层实施细节。因此，尽管不同的存储引擎具有不同的能力，应用程序是与之分离的。此外，使用者可以在服务器、数据库和表格三个层级中存储引擎，提供了极大的灵活性。</p>
+<p>mysql 常用的存储引擎包括 MYISAM、Innodb 和 Memory，其中各自的特点如下：</p>
+<blockquote>
+<p>1.MYISAM : 全表锁，拥有较高的执行速度，一个写请求请阻塞另外相同表格的所有读写请求，并发性能差，占用空间相对较小，mysql 5.5 及以下仅 MYISAM 支持全文索引，不支持事务。<br>2.Innodb：行级锁（SQL 都走索引查询），并发能力相对强，占用空间是 MYISAM 的 2.5 倍，不支持全文索引（5.6 开始支持），支持事务<br>3.Memory : 全表锁，存储在内存当中，速度快，但会占用和数据量成正比的内存空间且数据在 mysql 重启时会丢失。</p>
+</blockquote>
+<p>基于以上特性，建议绝大部份都设置为 innodb 引擎，特殊的业务再考虑选用 MYISAM 或 Memory ，如全文索引支持或极高的执行效率等。</p>
+<h4 id="分表方法"><a href="#分表方法" class="headerlink" title="分表方法"></a>分表方法</h4><p>在数据库表使用过程中，为了减小数据库服务器的负担、缩短查询时间，常常会考虑做分表设计。分表分两种，一种是纵向分表（将本来可以在同一个表的内容，人为划分存储在为多个不同结构的表）和横向分表（把大的表结构，横向切割为同样结构的不同表）。</p>
+<p>其中，纵向分表常见的方式有根据活跃度分表、根据重要性分表等。其主要解决问题如下：</p>
+<ol>
+<li>表与表之间资源争用问题；</li>
+<li>锁争用机率小；</li>
+<li>实现核心与非核心的分级存储，如UDB登陆库拆分成一级二级三级库</li>
+<li>解决了数据库同步压力问题。</li>
+</ol>
+<p>横向分表是指根据某些特定的规则来划分大数据量表，如根据时间分表。其主要解决问题如下：</p>
+<ol>
+<li>单表过大造成的性能问题；</li>
+<li>单表过大造成的单服务器空间问题。</li>
+</ol>
+<h4 id="索引问题"><a href="#索引问题" class="headerlink" title="索引问题"></a>索引问题</h4><p>索引是对数据库表中一个或多个列的值进行排序的结构，建立索引有助于更快地获取信息。 mysql 有四种不同的索引类型：</p>
+<ol>
+<li>主键索此 ( PRIMARY )</li>
+<li>唯一索引 ( UNIQUE )</li>
+<li>普通索引 ( INDEX )</li>
+<li>全文索引（FULLTEXT , MYISAM 及 mysql 5.6 以上的 Innodb ）</li>
+</ol>
+<p>建立索引的目的是加快对表中记录的查找或排序，索引也并非越多越好，因为创建索引是要付出代价的：一是增加了数据库的存储空间，二是在插入和修改数据时要花费较多的时间维护索引。</p>
+<p>在设计表或索引时，常出现以下几个问题：</p>
+<ol>
+<li>少建索引或不建索引。这个问题最突出，建议建表时 DBA 可以一起协助把关。</li>
+<li>索引滥用。滥用索引将导致写请求变慢，拖慢整体数据库的响应速度（5.5 以下的 mysql 只能用到一个索引)。</li>
+<li>从不考虑联合索引。实际上联合索引的效率往往要比单列索引的效率更高。</li>
+<li>非最优列选择。低选择性的字段不适合建单列索引，如 status 类型的字段。</li>
+</ol>
+<h2 id="慢-SQL-问题"><a href="#慢-SQL-问题" class="headerlink" title="慢 SQL 问题"></a>慢 SQL 问题</h2><h4 id="导致慢-SQL-的原因"><a href="#导致慢-SQL-的原因" class="headerlink" title="导致慢 SQL 的原因"></a>导致慢 SQL 的原因</h4><p>在遇到慢 SQL 情况时，不能简单的把原因归结为 SQL 编写问题(虽然这是最常见的因素)，实际上导致慢 SQL 有很多因素，甚至包括硬件和 mysql 本身的 bug。根据出现的概率从大到小，罗列如下：</p>
+<ol>
+<li>SQL编写问题</li>
+<li>锁</li>
+<li>业务实例相互干绕对 IO/CPU 资源争用</li>
+<li>服务器硬件</li>
+<li>MYSQL BUG</li>
+</ol>
+<h4 id="由-SQL-编写导致的慢-SQL-优化"><a href="#由-SQL-编写导致的慢-SQL-优化" class="headerlink" title="由 SQL 编写导致的慢 SQL 优化"></a>由 SQL 编写导致的慢 SQL 优化</h4><p>针对SQL编写导致的慢 SQL，优化起来还是相对比较方便的。正如上一节提到的正确的使用索引能加快查询速度，那么我们在编写 SQL 时就需要注意与索引相关的规则：</p>
+<ol>
+<li>字段类型转换导致不用索引，如字符串类型的不用引号，数字类型的用引号等，这有可能会用不到索引导致全表扫描；</li>
+<li>mysql 不支持函数转换，所以字段前面不能加函数，否则这将用不到索引；</li>
+<li>不要在字段前面加减运算；</li>
+<li>字符串比较长的可以考虑索引一部份减少索引文件大小，提高写入效率；</li>
+<li>like % 在前面用不到索引；</li>
+<li>根据联合索引的第二个及以后的字段单独查询用不到索引；</li>
+<li>不要使用 select *；</li>
+<li>排序请尽量使用升序 ;</li>
+<li>or 的查询尽量用 union 代替 （Innodb）；</li>
+<li>复合索引高选择性的字段排在前面；</li>
+<li>order by / group by 字段包括在索引当中减少排序，效率会更高。</li>
+</ol>
+<p>除了上述索引使用规则外，SQL 编写时还需要特别注意一下几点：</p>
+<ol>
+<li>尽量规避大事务的 SQL，大事务的 SQL 会影响数据库的并发性能及主从同步；</li>
+<li>分页语句 limit 的问题；</li>
+<li>删除表所有记录请用 truncate，不要用 delete；</li>
+<li>不让 mysql 干多余的事情，如计算；</li>
+<li>输写 SQL 带字段，以防止后面表变更带来的问题，性能也是比较优的 ( 涉及到数据字典解析，请自行查询资料)；</li>
+<li>在 Innodb上用 select count(*)，因为 Innodb 会存储统计信息；</li>
+<li>慎用 Order by rand()。</li>
+</ol>
+<h2 id="分析诊断工具"><a href="#分析诊断工具" class="headerlink" title="分析诊断工具"></a>分析诊断工具</h2><p>在日常开发工作中，我们可以做一些工作达到预防慢 SQL 问题，比如在上线前预先用诊断工具对 SQL 进行分析。常用的工具有：</p>
+<ol>
+<li>mysqldumpslow</li>
+<li>mysql profile</li>
+<li>mysql explain</li>
+</ol>
+<p>具体使用及分析方法在此就不赘述，网上有丰富的资源可以参考。</p>
+<h2 id="误操作、程序-bug-时怎么办"><a href="#误操作、程序-bug-时怎么办" class="headerlink" title="误操作、程序 bug 时怎么办"></a>误操作、程序 bug 时怎么办</h2><p>提出这个问题显然主要是针对刚开始工作的年轻同行们……实际上误操作和程序 bug 导致数据误删或者混乱的问题并非少见，但是刚入行的开发工作者会比较紧张。一个成熟的企业往往会有完善的数据管理规范和较丰富的数据恢复方案（初创公司除外），会进行数据备份和数据容灾。当你发现误操作或程序 bug 导致线上数据被误删或误改动时，一定不能慌乱，应及时与 DBA 联系，第一时间进行数据恢复（严重时直接停止服务），尽可能减少影响和损失。对于重要数据（如资金）的操作，在开发时一定要反复进行测试，确保没有问题后再上线。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Mysql/">Mysql</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/05/09/2018-05-09-attention/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">歌曲Attention</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/05/04/2018-05-04-linux-shell/">
+                        <span class="hidden-mobile">Linux中常用Shell命令</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#valine",
+          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
+          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        鄂ICP备17026246号-1
+      </a>
+    </span>
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-5VCD453CKL', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-5VCD453CKL');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

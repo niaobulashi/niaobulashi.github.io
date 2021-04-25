@@ -1,0 +1,718 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
+  <meta name="author" content="niaobulashi">
+  <meta name="keywords" content="个人博客, 鸟不拉屎, Java, 个人博客, 鸟不拉诗">
+  
+  <title>Spring Boot2(十)：RabbitMQ 详解 - 鸟不拉诗</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/bg.svg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Spring Boot2(十)：RabbitMQ 详解">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-07-08 00:00" pubdate>
+        2019年7月8日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      41
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Spring Boot2(十)：RabbitMQ 详解</h1>
+            
+            <div class="markdown-body">
+              <p>RabbitMQ 即一个消息队列，主要是用来实现应用程序的异步和解耦，同时也能起到消息缓冲，消息分发的作用。</p>
+<p>消息中间件在互联网公司的使用中越来越多，刚才还看到新闻阿里将 RocketMQ 捐献给了 Apache，当然了今天的主角还是讲 RabbitMQ。消息中间件最主要的作用是解耦，中间件最标准的用法是生产者生产消息传送到队列，消费者从队列中拿取消息并处理，生产者不用关心是谁来消费，消费者不用关心谁在生产消息，从而达到解耦的目的。在分布式的系统中，消息队列也会被用在很多其它的方面，比如：分布式事务的支持，RPC 的调用等等。</p>
+<p>以前一直使用的是 ActiveMQ，在实际的生产使用中也出现了一些小问题，在网络查阅了很多的资料后，决定尝试使用 RabbitMQ 来替换 ActiveMQ，RabbitMQ 的高可用性、高性能、灵活性等一些特点吸引了我们，查阅了一些资料整理出此文。</p>
+<h2 id="RabbitMQ-介绍"><a href="#RabbitMQ-介绍" class="headerlink" title="RabbitMQ 介绍"></a>RabbitMQ 介绍</h2><p>RabbitMQ 是实现 AMQP（高级消息队列协议）的消息中间件的一种，最初起源于金融系统，用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。 RabbitMQ 主要是为了实现系统之间的双向解耦而实现的。当生产者大量产生数据时，消费者无法快速消费，那么需要一个中间层。保存这个数据。</p>
+<p>AMQP，即 Advanced Message Queuing Protocol，高级消息队列协议，是应用层协议的一个开放标准，为面向消息的中间件设计。消息中间件主要用于组件之间的解耦，消息的发送者无需知道消息使用者的存在，反之亦然。AMQP 的主要特征是面向消息、队列、路由（包括点对点和发布/订阅）、可靠性、安全。</p>
+<p>RabbitMQ 是一个开源的 AMQP 实现，服务器端用Erlang语言编写，支持多种客户端，如：Python、Ruby、.NET、Java、JMS、C、PHP、ActionScript、XMPP、STOMP 等，支持 AJAX。用于在分布式系统中存储转发消息，在易用性、扩展性、高可用性等方面表现不俗。</p>
+<h3 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h3><p>通常我们谈到队列服务, 会有三个概念： 发消息者、队列、收消息者，RabbitMQ 在这个基本概念之上, 多做了一层抽象, 在发消息者和 队列之间, 加入了交换器 (Exchange). 这样发消息者和队列就没有直接联系, 转而变成发消息者把消息给交换器, 交换器根据调度策略再把消息再给队列。</p>
+<p><img src="http://www.itmind.net/assets/images/2016/RabbitMQ01.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="img"></p>
+<ul>
+<li>左侧 P 代表 生产者，也就是往 RabbitMQ 发消息的程序。</li>
+<li>中间即是 RabbitMQ，<em>其中包括了 交换机 和 队列。</em></li>
+<li>右侧 C 代表 消费者，也就是往 RabbitMQ 拿消息的程序。</li>
+</ul>
+<p>那么，<em>其中比较重要的概念有 4 个，分别为：虚拟主机，交换机，队列，和绑定。</em></p>
+<ul>
+<li>虚拟主机：一个虚拟主机持有一组交换机、队列和绑定。为什么需要多个虚拟主机呢？很简单， RabbitMQ 当中，<em>用户只能在虚拟主机的粒度进行权限控制。</em> 因此，如果需要禁止A组访问B组的交换机/队列/绑定，必须为A和B分别创建一个虚拟主机。每一个 RabbitMQ 服务器都有一个默认的虚拟主机“/”。</li>
+<li>交换机：<em>Exchange 用于转发消息，但是它不会做存储</em> ，如果没有 Queue bind 到 Exchange 的话，它会直接丢弃掉 Producer 发送过来的消息。 这里有一个比较重要的概念：<strong>路由键</strong> 。消息到交换机的时候，交互机会转发到对应的队列中，那么究竟转发到哪个队列，就要根据该路由键。</li>
+<li>绑定：也就是交换机需要和队列相绑定，这其中如上图所示，是多对多的关系。</li>
+</ul>
+<h3 id="交换机-Exchange"><a href="#交换机-Exchange" class="headerlink" title="交换机(Exchange)"></a>交换机(Exchange)</h3><p>交换机的功能主要是接收消息并且转发到绑定的队列，交换机不存储消息，在启用ack模式后，交换机找不到队列会返回错误。交换机有四种类型：Direct, topic, Headers and Fanout</p>
+<ul>
+<li>Direct：direct 类型的行为是”先匹配, 再投送”. 即在绑定时设定一个 <strong>routing_key</strong>, 消息的<strong>routing_key</strong> 匹配时, 才会被交换器投送到绑定的队列中去.</li>
+<li>Topic：按规则转发消息（最灵活）</li>
+<li>Headers：设置 header attribute 参数类型的交换机</li>
+<li>Fanout：转发消息到所有绑定队列</li>
+</ul>
+<p><strong>Direct Exchange</strong></p>
+<p>Direct Exchange 是 RabbitMQ 默认的交换机模式，也是最简单的模式，根据key全文匹配去寻找队列。<br><img src="http://www.itmind.net/assets/images/2016/rabbitMq_direct.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="img"></p>
+<p>第一个 X - Q1 就有一个 binding key，名字为 orange； X - Q2 就有 2 个 binding key，名字为 black 和 green。<em>当消息中的 路由键 和 这个 binding key 对应上的时候，那么就知道了该消息去到哪一个队列中。</em></p>
+<p>Ps：为什么 X 到 Q2 要有 black，green，2个 binding key呢，一个不就行了吗？ - 这个主要是因为可能又有 Q3，而Q3只接受 black 的信息，而Q2不仅接受black 的信息，还接受 green 的信息。</p>
+<p><strong>Topic Exchange</strong></p>
+<p><em>Topic Exchange 转发消息主要是根据通配符。</em> 在这种交换机下，队列和交换机的绑定会定义一种路由模式，那么，通配符就要在这种路由模式和路由键之间匹配后交换机才能转发消息。</p>
+<p>在这种交换机模式下：</p>
+<ul>
+<li>路由键必须是一串字符，用句号（<code>.</code>） 隔开，比如说 agreements.us，或者 agreements.eu.stockholm 等。</li>
+<li>路由模式必须包含一个 星号（<code>*</code>），主要用于匹配路由键指定位置的一个单词，比如说，一个路由模式是这样子：agreements..b.*，那么就只能匹配路由键是这样子的：第一个单词是 agreements，第四个单词是 b。 井号（#）就表示相当于一个或者多个单词，例如一个匹配模式是 agreements.eu.berlin.#，那么，以agreements.eu.berlin 开头的路由键都是可以的。</li>
+</ul>
+<p>具体代码发送的时候还是一样，第一个参数表示交换机，第二个参数表示 routing key，第三个参数即消息。如下：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-selector-tag">rabbitTemplate</span><span class="hljs-selector-class">.convertAndSend</span>(<span class="hljs-string">&quot;testTopicExchange&quot;</span>,<span class="hljs-string">&quot;key1.a.c.key2&quot;</span>, <span class="hljs-string">&quot; this is  RabbitMQ!&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<p>topic 和 direct 类似, 只是匹配上支持了”模式”, 在”点分”的 routing_key 形式中, 可以使用两个通配符:</p>
+<ul>
+<li><code>*</code>表示一个词.</li>
+<li><code>#</code>表示零个或多个词.</li>
+</ul>
+<p><strong>Headers Exchange</strong></p>
+<p>headers 也是根据规则匹配, 相较于 direct 和 topic 固定地使用 routing_key , headers 则是一个自定义匹配规则的类型. 在队列与交换器绑定时, 会设定一组键值对规则, 消息中也包括一组键值对( headers 属性), 当这些键值对有一对, 或全部匹配时, 消息被投送到对应队列.</p>
+<p><strong>Fanout Exchange</strong></p>
+<p>Fanout Exchange 消息广播的模式，不管路由键或者是路由模式，<em>会把消息发给绑定给它的全部队列</em>，如果配置了 routing_key 会被忽略。</p>
+<h2 id="Spring-Boot-集成-RabbitMQ"><a href="#Spring-Boot-集成-RabbitMQ" class="headerlink" title="Spring Boot 集成 RabbitMQ"></a>Spring Boot 集成 RabbitMQ</h2><p>Spring Boot 集成 RabbitMQ 非常简单，如果只是简单的使用配置非常少，Spring Boot 提供了<code>spring-boot-starter-amqp</code> 项目对消息各种支持。</p>
+<h3 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h3><p>1、配置 Pom 包，主要是添加 <code>spring-boot-starter-amqp</code> 的支持</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-amqp<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>2、配置文件</p>
+<p>配置 RabbitMQ 的安装地址、端口以及账户信息</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">spring.application.name</span>=Spring-boot-rabbitmq<br><br><span class="hljs-attr">spring.rabbitmq.host</span>=<span class="hljs-number">192.168</span>.<span class="hljs-number">0.86</span><br><span class="hljs-attr">spring.rabbitmq.port</span>=<span class="hljs-number">5672</span><br><span class="hljs-attr">spring.rabbitmq.username</span>=admin<br><span class="hljs-attr">spring.rabbitmq.password</span>=<span class="hljs-number">123456</span><br></code></pre></td></tr></table></figure>
+
+<p>3、队列配置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RabbitConfig</span> </span>&#123;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Queue <span class="hljs-title">Queue</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Queue(<span class="hljs-string">&quot;hello&quot;</span>);<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>3、发送者</p>
+<p>rabbitTemplate 是 Spring Boot 提供的默认实现</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@component</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloSender</span> </span>&#123;<br><br>	<span class="hljs-meta">@Autowired</span><br>	<span class="hljs-keyword">private</span> AmqpTemplate rabbitTemplate;<br><br>	<span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-function"><span class="hljs-title">send</span>(<span class="hljs-params"></span>)</span> &#123;<br>		<span class="hljs-built_in">String</span> context = <span class="hljs-string">&quot;hello &quot;</span> + <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();<br>		System.out.println(<span class="hljs-string">&quot;Sender : &quot;</span> + context);<br>		<span class="hljs-built_in">this</span>.rabbitTemplate.convertAndSend(<span class="hljs-string">&quot;hello&quot;</span>, context);<br>	&#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>4、接收者</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@Component</span><br><span class="hljs-variable">@RabbitListener</span>(queues = <span class="hljs-string">&quot;hello&quot;</span>)<br>public class HelloReceiver &#123;<br><br>    <span class="hljs-variable">@RabbitHandler</span><br>    public void process(String hello) &#123;<br>        <span class="hljs-selector-tag">System</span><span class="hljs-selector-class">.out</span><span class="hljs-selector-class">.println</span>(<span class="hljs-string">&quot;Receiver  : &quot;</span> + hello);<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>5、测试</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@RunWith</span>(SpringRunner.class)<br><span class="hljs-variable">@SpringBootTest</span><br>public class RabbitMqHelloTest &#123;<br><br>	<span class="hljs-variable">@Autowired</span><br>	private HelloSender helloSender;<br><br>	<span class="hljs-variable">@Test</span><br>	public void hello() throws Exception &#123;<br>		<span class="hljs-selector-tag">helloSender</span><span class="hljs-selector-class">.send</span>();<br>	&#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意，发送者和接收者的 queue name 必须一致，不然不能接收</p>
+</blockquote>
+<h3 id="多对多使用"><a href="#多对多使用" class="headerlink" title="多对多使用"></a>多对多使用</h3><p>一个发送者，N 个接收者或者 N 个发送者和 N 个接收者会出现什么情况呢？</p>
+<p><strong>一对多发送</strong></p>
+<p>对上面的代码进行了小改造，接收端注册了两个 Receiver,Receiver1 和 Receiver2，发送端加入参数计数，接收端打印接收到的参数，下面是测试代码，发送一百条消息，来观察两个接收端的执行效果</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-meta">@Test</span><br><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">oneToMany</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100</span>;i++)&#123;<br>		neoSender.send(i);<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">11</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">12</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">14</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">13</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">15</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">16</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">18</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">17</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">19</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">20</span><br></code></pre></td></tr></table></figure>
+
+<p>根据返回结果得到以下结论</p>
+<blockquote>
+<p>一个发送者，N个接受者,经过测试会均匀的将消息发送到N个接收者中</p>
+</blockquote>
+<p><strong>多对多发送</strong></p>
+<p>复制了一份发送者，加入标记，在一百个循环中相互交替发送</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-meta">@Test</span><br>	<span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">manyToMany</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100</span>;i++)&#123;<br>			neoSender.send(i);<br>			neoSender2.send(i);<br>		&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">20</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">20</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">21</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">21</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">22</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">22</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">23</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">23</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">24</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">24</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">1</span>: Spring boot neo queue ****** <span class="hljs-number">25</span><br><span class="hljs-attribute">Receiver</span> <span class="hljs-number">2</span>: Spring boot neo queue ****** <span class="hljs-number">25</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>结论：和一对多一样，接收端仍然会均匀接收到消息</p>
+</blockquote>
+<h3 id="高级使用"><a href="#高级使用" class="headerlink" title="高级使用"></a>高级使用</h3><p><strong>对象的支持</strong></p>
+<p>Spring Boot 以及完美的支持对象的发送和接收，不需要格外的配置。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-comment">//发送者</span><br><span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-function"><span class="hljs-title">send</span>(<span class="hljs-params">User user</span>)</span> &#123;<br>	System.out.println(<span class="hljs-string">&quot;Sender object: &quot;</span> + user.toString());<br>	<span class="hljs-built_in">this</span>.rabbitTemplate.convertAndSend(<span class="hljs-string">&quot;object&quot;</span>, user);<br>&#125;<br><br>...<br><br><span class="hljs-comment">//接收者</span><br><span class="hljs-meta">@RabbitHandler</span><br><span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-function"><span class="hljs-title">process</span>(<span class="hljs-params">User user</span>)</span> &#123;<br>    System.out.println(<span class="hljs-string">&quot;Receiver object : &quot;</span> + user);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">Sender <span class="hljs-keyword">object</span>: <span class="hljs-keyword">User</span>&#123;<span class="hljs-type">name</span>=<span class="hljs-string">&#x27;neo&#x27;</span>, pass=<span class="hljs-string">&#x27;123456&#x27;</span>&#125;<br>Receiver <span class="hljs-keyword">object</span> : <span class="hljs-keyword">User</span>&#123;<span class="hljs-type">name</span>=<span class="hljs-string">&#x27;neo&#x27;</span>, pass=<span class="hljs-string">&#x27;123456&#x27;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>Topic Exchange</strong></p>
+<p>topic 是 RabbitMQ 中最灵活的一种方式，可以根据 routing_key 自由的绑定不同的队列</p>
+<p>首先对 topic 规则配置，这里使用两个队列来测试</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TopicRabbitConfig</span> </span>&#123;<br><br>    final <span class="hljs-keyword">static</span> <span class="hljs-built_in">String</span> message = <span class="hljs-string">&quot;topic.message&quot;</span>;<br>    final <span class="hljs-keyword">static</span> <span class="hljs-built_in">String</span> messages = <span class="hljs-string">&quot;topic.messages&quot;</span>;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-keyword">public</span> Queue <span class="hljs-function"><span class="hljs-title">queueMessage</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Queue(TopicRabbitConfig.message);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-keyword">public</span> Queue <span class="hljs-function"><span class="hljs-title">queueMessages</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Queue(TopicRabbitConfig.messages);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    TopicExchange <span class="hljs-function"><span class="hljs-title">exchange</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> TopicExchange(<span class="hljs-string">&quot;exchange&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    Binding <span class="hljs-function"><span class="hljs-title">bindingExchangeMessage</span>(<span class="hljs-params">Queue queueMessage, TopicExchange exchange</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> BindingBuilder.bind(queueMessage).to(exchange).with(<span class="hljs-string">&quot;topic.message&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    Binding <span class="hljs-function"><span class="hljs-title">bindingExchangeMessages</span>(<span class="hljs-params">Queue queueMessages, TopicExchange exchange</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> BindingBuilder.bind(queueMessages).to(exchange).with(<span class="hljs-string">&quot;topic.#&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>使用 queueMessages 同时匹配两个队列，queueMessage 只匹配 “topic.message” 队列</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">send1</span><span class="hljs-params">()</span> </span>&#123;<br>	<span class="hljs-keyword">String</span> context = <span class="hljs-string">&quot;hi, i am message 1&quot;</span>;<br>	System.out.<span class="hljs-built_in">println</span>(<span class="hljs-string">&quot;Sender : &quot;</span> + context);<br>	<span class="hljs-keyword">this</span>.rabbitTemplate.<span class="hljs-built_in">convertAndSend</span>(<span class="hljs-string">&quot;exchange&quot;</span>, <span class="hljs-string">&quot;topic.message&quot;</span>, context);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">send2</span><span class="hljs-params">()</span> </span>&#123;<br>	<span class="hljs-keyword">String</span> context = <span class="hljs-string">&quot;hi, i am messages 2&quot;</span>;<br>	System.out.<span class="hljs-built_in">println</span>(<span class="hljs-string">&quot;Sender : &quot;</span> + context);<br>	<span class="hljs-keyword">this</span>.rabbitTemplate.<span class="hljs-built_in">convertAndSend</span>(<span class="hljs-string">&quot;exchange&quot;</span>, <span class="hljs-string">&quot;topic.messages&quot;</span>, context);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>发送send1会匹配到topic.#和topic.message 两个Receiver都可以收到消息，发送send2只有topic.#可以匹配所有只有Receiver2监听到消息</p>
+<p><strong>Fanout Exchange</strong></p>
+<p>Fanout 就是我们熟悉的广播模式或者订阅模式，给 Fanout 交换机发送消息，绑定了这个交换机的所有队列都收到这个消息。</p>
+<p>Fanout 相关配置</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@Configuration</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FanoutRabbitConfig</span> </span>&#123;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-keyword">public</span> Queue <span class="hljs-function"><span class="hljs-title">AMessage</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Queue(<span class="hljs-string">&quot;fanout.A&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-keyword">public</span> Queue <span class="hljs-function"><span class="hljs-title">BMessage</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Queue(<span class="hljs-string">&quot;fanout.B&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    <span class="hljs-keyword">public</span> Queue <span class="hljs-function"><span class="hljs-title">CMessage</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Queue(<span class="hljs-string">&quot;fanout.C&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    FanoutExchange <span class="hljs-function"><span class="hljs-title">fanoutExchange</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FanoutExchange(<span class="hljs-string">&quot;fanoutExchange&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    Binding <span class="hljs-function"><span class="hljs-title">bindingExchangeA</span>(<span class="hljs-params">Queue AMessage,FanoutExchange fanoutExchange</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> BindingBuilder.bind(AMessage).to(fanoutExchange);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    Binding <span class="hljs-function"><span class="hljs-title">bindingExchangeB</span>(<span class="hljs-params">Queue BMessage, FanoutExchange fanoutExchange</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> BindingBuilder.bind(BMessage).to(fanoutExchange);<br>    &#125;<br><br>    <span class="hljs-meta">@Bean</span><br>    Binding <span class="hljs-function"><span class="hljs-title">bindingExchangeC</span>(<span class="hljs-params">Queue CMessage, FanoutExchange fanoutExchange</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> BindingBuilder.bind(CMessage).to(fanoutExchange);<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里使用了 A、B、C 三个队列绑定到 Fanout 交换机上面，发送端的 routing_key 写任何字符都会被忽略：</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">send</span><span class="hljs-params">()</span> </span>&#123;<br>	<span class="hljs-keyword">String</span> context = <span class="hljs-string">&quot;hi, fanout msg &quot;</span>;<br>	System.out.<span class="hljs-built_in">println</span>(<span class="hljs-string">&quot;Sender : &quot;</span> + context);<br>	<span class="hljs-keyword">this</span>.rabbitTemplate.<span class="hljs-built_in">convertAndSend</span>(<span class="hljs-string">&quot;fanoutExchange&quot;</span>,<span class="hljs-string">&quot;&quot;</span>, context);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<figure class="highlight ldif"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs ldif"><span class="hljs-attribute">Sender </span>: hi, fanout msg <br>...<br><span class="hljs-attribute">fanout Receiver B</span>: hi, fanout msg <br><span class="hljs-attribute">fanout Receiver A  </span>: hi, fanout msg <br><span class="hljs-attribute">fanout Receiver C</span>: hi, fanout msg <br></code></pre></td></tr></table></figure>
+
+<p>结果说明，绑定到 fanout 交换机上面的队列都收到了消息</p>
+<blockquote>
+<p>文章内容已经升级到 Spring Boot 2.x</p>
+</blockquote>
+<p><strong>示例代码-github</strong></p>
+<p><strong>示例代码-码云</strong></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.zouyesheng.com/rabbitmq.html">RabbitMQ 使用参考</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/401Studio/WeekLearn/issues/2">RabbitMQ：Spring 集成 RabbitMQ 与其概念，消息持久化，ACK机制</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/SpringBoot/">SpringBoot</a>
+                    
+                      <a class="hover-with-bg" href="/tags/RabbitMQ/">RabbitMQ</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/07/10/2019-07-10-mybatis-note/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Spring Boot2(十一)：Mybatis使用总结（自增长、多条件、批量操作、多表查询等等）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/07/07/2019-07-07-banner/">
+                        <span class="hidden-mobile">Spring Boot2(八)：性感banner，在线发牌</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#valine",
+          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
+          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        鄂ICP备17026246号-1
+      </a>
+    </span>
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-5VCD453CKL', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-5VCD453CKL');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

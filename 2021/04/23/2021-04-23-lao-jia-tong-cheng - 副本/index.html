@@ -1,0 +1,784 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
+  <meta name="author" content="niaobulashi">
+  <meta name="keywords" content="个人博客, 鸟不拉屎, Java, 个人博客, 鸟不拉诗">
+  
+  <title>老家通城 - 鸟不拉诗</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/bg.svg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="老家通城">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-04-23 11:12" pubdate>
+        2021年4月23日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      15
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">老家通城</h1>
+            
+            <div class="markdown-body">
+              <div class="note note-success">
+            <p>纪念一下老家通城，土生土长的地方</p>
+          </div>
+
+
+
+<p>老家通城上个世纪的那些老房子</p>
+<p>都在岁月斑驳里被拆了</p>
+<p>那些熟悉的街道都变了模样</p>
+<p>有些东西在时代更迭里弄丢了</p>
+<p>有些事情在兜兜转转给忘了</p>
+<p>通城，就在这不知不觉中慢慢“消失”了</p>
+<p>我们家也快要拆了</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210423094521.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="家的院子1"></p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210423094542.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="家的院子2"></p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210423094547.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="家的院子3"></p>
+<h2 id="消失的生活"><a href="#消失的生活" class="headerlink" title="消失的生活"></a><strong>消失的生活</strong></h2><p>那时候邻里间处得就跟一家人似的</p>
+<p>有事大家帮忙不要工钱</p>
+<p>还集体出工</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/5_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="插秧"></p>
+<p>在甘薯地里追肥的老照片</p>
+<p>那时候一家人晚饭后</p>
+<p>在房前看星星乘凉，孩子们嬉闹玩耍</p>
+<p>没有手机，没有电脑</p>
+<p>交流很多，感情很浓</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/6_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="一家人的晚饭后"></p>
+<p>那时候，我们没心没肺</p>
+<p>无忧无虑，无拘无束</p>
+<h2 id="老行当"><a href="#老行当" class="headerlink" title="老行当"></a><strong>老行当</strong></h2><h3 id="1、弹棉花"><a href="#1、弹棉花" class="headerlink" title="1、弹棉花"></a>1、弹棉花</h3><p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/7_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="弹棉花"></p>
+<p><strong>一张弹弓</strong></p>
+<p><strong>一张磨盘</strong></p>
+<p><strong>一个弹花锤</strong></p>
+<p><strong>一条牵纱篾</strong></p>
+<p>就是“弹棉郎”最初谋生的全部行当</p>
+<p>旧时代，通城人结婚都必须要</p>
+<p>请人打棉絮</p>
+<p>新打出来的棉絮</p>
+<p>人们会用红毛线在上面写上年份</p>
+<p>转眼间</p>
+<p>“弹棉花”这门老行当渐渐淡出了人们的生活</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/8_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="弹棉花2"></p>
+<h3 id="2、做草鞋"><a href="#2、做草鞋" class="headerlink" title="2、做草鞋"></a>2、做草鞋</h3><p>草鞋是中国古人发明的一种鞋</p>
+<p>下地干活、上山砍柴</p>
+<p>伐木、采药、狩猎</p>
+<p>不分晴雨</p>
+<p>永远是一双草鞋穿在脚上</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/9_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="编草席"></p>
+<p>随着历史的发展</p>
+<p>形成了<strong>“草鞋文化”</strong></p>
+<p>表现劳动人民<strong>勤劳、智慧、勇气和奋斗</strong></p>
+<h3 id="3、打铁匠"><a href="#3、打铁匠" class="headerlink" title="3、打铁匠"></a>3、打铁匠</h3><p>打铁铺里</p>
+<p>铁砧上溅出炽热的火光</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/10_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="打铁匠"></p>
+<p>张打铁、李打铁</p>
+<p>打铁师傅们</p>
+<p>你一下，我一下</p>
+<p>发出“叮叮叮”的声音</p>
+<p>热火朝天…</p>
+<p>通城人用的锄头、菜刀</p>
+<p>斧头、砍柴刀…</p>
+<p>都来自打铁铺</p>
+<h3 id="4、卖货郎"><a href="#4、卖货郎" class="headerlink" title="4、卖货郎"></a>4、卖货郎</h3><p>记忆中，卖货郎推着车</p>
+<p>摇着拨浪鼓</p>
+<p>从大街小巷走过</p>
+<p>身边总是围着一群小孩子</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="卖货郎"></p>
+<p>卖货郎的车子是个神奇的<strong>“百货天地”</strong></p>
+<p>各种各样的东西</p>
+<p>应有尽有</p>
+<h3 id="5、老木匠"><a href="#5、老木匠" class="headerlink" title="5、老木匠"></a>5、老木匠</h3><p>读书时候用的书桌、书柜</p>
+<p>都是爷爷一手打造的</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/12_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="老木匠"></p>
+<p>刚打好的木工制品</p>
+<p>有着一股浓浓的木头的清香味~</p>
+<p>为了纪念</p>
+<p>会在上面写上年份和名字</p>
+<p>“某某某记用”</p>
+<h3 id="6、老篾匠"><a href="#6、老篾匠" class="headerlink" title="6、老篾匠"></a>6、老篾匠</h3><p>篾匠是一门古老的职业</p>
+<p>通城又盛产楠竹</p>
+<p>通城人用的篮子、簸箕、箩筐</p>
+<p>都出自这些老篾匠之手</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/13_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="老篾匠"></p>
+<p>图来源@刘建平摄影师</p>
+<p>通城励志盲人老篾匠周四甫正在编织篮子</p>
+<h3 id="7、剃头匠"><a href="#7、剃头匠" class="headerlink" title="7、剃头匠"></a>7、剃头匠</h3><p>以前的剃头铺</p>
+<p>很简单也很美好</p>
+<p>一个剃头师傅</p>
+<p>一面镜子</p>
+<p>一张椅子</p>
+<p>一把剃头刀</p>
+<p>就是整个剃头铺的组成</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/14_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="剃头匠"></p>
+<p>老师傅的手艺很好</p>
+<p>一步一步、不慌不忙</p>
+<p>不出几分钟保准是个焕然一新的你</p>
+<p><strong>8、修鞋匠</strong></p>
+<p>在这个人人都追求潮流的时代</p>
+<p>修鞋，正在变成一个陌生的动词</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/15_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="修鞋匠"></p>
+<p>小喇叭里总是传来熟悉的声音</p>
+<p><strong>“修鞋、修雨伞、上拉链…”</strong></p>
+<p>修鞋匠是很神奇的存在</p>
+<p>除了修鞋，在他们手里</p>
+<p>只要是能修的，都能给你修好</p>
+<p><strong>9、补锅匠</strong></p>
+<p>在这个人人都用电饭煲的时代</p>
+<p>年轻的一代很少知道</p>
+<p>以前通城有补锅匠这一行当</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/16_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="补锅匠"></p>
+<p>各种砂锅铁锅锑锅</p>
+<p>师傅都能补</p>
+<p>除了修东西还自带一些其他手艺</p>
+<p>通常都不需要给钱</p>
+<p>只需要给点米就行了</p>
+<h3 id="8、炸米泡"><a href="#8、炸米泡" class="headerlink" title="8、炸米泡"></a>8、炸米泡</h3><p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/17_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="图片"></p>
+<p>曾经在通城大街上那些习以为常的画面</p>
+<p>狭长的街道上、熟悉的叫卖声</p>
+<p>如今何在？还记得“炸米泡”的场景？</p>
+<p>消失的东西还有很多很多</p>
+<p>短短一篇文章根本</p>
+<p>装不下大家满满的回忆</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/18_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="通城雁塔"></p>
+<p>如今我们都已长大</p>
+<p>通城也在逐渐发生变化</p>
+<p>一座城市的发展</p>
+<p>也意味着许多时代的印记</p>
+<p>在不断地消失</p>
+<p>或许，未来还要迎来更多告别</p>
+<p>但这种“消失”，也意味着一种成长</p>
+<p>城市的成长少不了更替迭代</p>
+<p>那些“消失”的部分</p>
+<p>终有一天，会生长出新的希望！</p>
+<h2 id="未通火车"><a href="#未通火车" class="headerlink" title="未通火车"></a>未通火车</h2><p>比较遗憾的是到现在通城还没有火车</p>
+<p>去武汉还得去客运站坐客车</p>
+<p>如果赶时间的话，就得坐拼车了</p>
+<p>希望以后可以规划建设火车</p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/19_640.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="通城客运站"></p>
+<h2 id="房价乱象"><a href="#房价乱象" class="headerlink" title="房价乱象"></a>房价乱象</h2><p>想不通的是，78线小城市，房价竟然可以飙到这么高</p>
+<div id="echarts710" style="width: 81%;height: 400px;margin: 0 auto"></div>
+<script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('echarts710'));
+
+        // 指定图表的配置项和数据
+        var option = {
+    title: {
+        text: '通城县房价走势'
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data: ['通城县', '咸宁']
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    toolbox: {
+        feature: {
+            saveAsImage: {}
+        }
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: [4944, 4986, 4500, 4500, 4500, 4300, 4200, 4172, 4172, 4290, 4290, 4290, 4290]
+    },
+    yAxis: {
+        type: 'value',
+        scale:true
+    },
+    series: [
+        {
+            name: '通城县',
+            type: 'line',
+            data: [4944, 4986, 4500, 4500, 4500, 4200, 4172, 4172, 4290, 4290, 4290, 4290]
+        },
+        {
+            name: '咸宁',
+            type: 'line',
+            data: [4781, 4772, 4675, 4659, 4640, 4625, 4604, 4555, 4557, 4574, 4559, 4649, 4625]
+        }
+    ]
+};
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+</script>
+
+<p>请先把通城的火车规划出来吧</p>
+<p>一个城市的发展不是从炒房价开始的，而是从基建开始。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>通城的发展也越来越快，通城政府吸引着很多公司进驻，打造很多园区和主题性的片区。</p>
+<p>还是下了功夫的，也有不少的可以旅游的地方，可以去逛逛，环境也管理的不错。</p>
+<p>希望不忘初心，稳步发展，钱都掏出来搞城市发展</p>
+<p>一定会越来越好的</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Life/">Life</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/04/23/2021-04-23-zui-jin-cheng-mi-you-xi/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">最近有点沉迷switch游戏</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/21/2021-04-21-wu-yi-hui-jia-piao-nan-mai/">
+                        <span class="hidden-mobile">五一回家一票难求哇</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#valine",
+          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
+          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        鄂ICP备17026246号-1
+      </a>
+    </span>
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-5VCD453CKL', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-5VCD453CKL');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

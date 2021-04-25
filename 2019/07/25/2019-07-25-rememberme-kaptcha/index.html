@@ -1,0 +1,785 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
+  <meta name="author" content="niaobulashi">
+  <meta name="keywords" content="个人博客, 鸟不拉屎, Java, 个人博客, 鸟不拉诗">
+  
+  <title>Spring Boot2(十五)：Shiro记住我rememberMe、验证码Kaptcha - 鸟不拉诗</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/bg.svg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Spring Boot2(十五)：Shiro记住我rememberMe、验证码Kaptcha">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-07-25 00:00" pubdate>
+        2019年7月25日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      50
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Spring Boot2(十五)：Shiro记住我rememberMe、验证码Kaptcha</h1>
+            
+            <div class="markdown-body">
+              <p>接着上次学习的《Spring Boot2(十二)：手摸手教你搭建Shiro安全框架》，实现了Shiro的认证和授权。今天继续在这个基础上学习Shiro实现功能记住我rememberMe，以及登录时验证码Kaptcha。</p>
+<p>Remember Me记住我：用户的登录状态会不会因为浏览器的关闭而失效，直到Cookie失效。关闭浏览器后，再次访问登录后的页面可以不用登录。因为用Cookie实现，故只在同一浏览器中有效。</p>
+<p>Kaptcha验证码：是谷歌开源的验证码插件，实现登录的验证码验证拦截。</p>
+<h2 id="一、记住我rememberMe"><a href="#一、记住我rememberMe" class="headerlink" title="一、记住我rememberMe"></a>一、记住我rememberMe</h2><p>用户的登录状态会不会因为浏览器的关闭而失效，直到Cookie失效。关闭浏览器后，再次访问登录后的页面可以不用登录。因为用Cookie实现，故只在同一浏览器中有效。</p>
+<h3 id="修改ShiroConfig"><a href="#修改ShiroConfig" class="headerlink" title="修改ShiroConfig"></a>修改ShiroConfig</h3><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 路径过滤规则</span><br><span class="hljs-comment"> * @return</span><br><span class="hljs-comment"> */</span><br>@Bean<br><span class="hljs-function"><span class="hljs-keyword">public</span> ShiroFilterFactoryBean <span class="hljs-title">shiroFilter</span><span class="hljs-params">(SecurityManager securityManager)</span> </span>&#123;<br>	ShiroFilterFactoryBean shiroFilterFactoryBean = <span class="hljs-keyword">new</span> <span class="hljs-built_in">ShiroFilterFactoryBean</span>();<br>	shiroFilterFactoryBean.<span class="hljs-built_in">setSecurityManager</span>(securityManager);<br>	<span class="hljs-comment">// 如果不设置默认会自动寻找Web工程根目录下的&quot;/login.jsp&quot;页面</span><br>	shiroFilterFactoryBean.<span class="hljs-built_in">setLoginUrl</span>(<span class="hljs-string">&quot;/login&quot;</span>);<br>	shiroFilterFactoryBean.<span class="hljs-built_in">setSuccessUrl</span>(<span class="hljs-string">&quot;/index&quot;</span>);<br>	<span class="hljs-comment">// 拦截器</span><br>	LinkedHashMap&lt;<span class="hljs-keyword">String</span>, <span class="hljs-keyword">String</span>&gt; map = <span class="hljs-keyword">new</span> LinkedHashMap&lt;&gt;();<br>	<span class="hljs-comment">// 配置不会被拦截的链接 顺序判断</span><br>	<span class="hljs-comment">// 对静态资源设置匿名访问</span><br>	map.<span class="hljs-built_in">put</span>(<span class="hljs-string">&quot;/static/**&quot;</span>, <span class="hljs-string">&quot;anon&quot;</span>);<br>	map.<span class="hljs-built_in">put</span>(<span class="hljs-string">&quot;/css/**&quot;</span>, <span class="hljs-string">&quot;anon&quot;</span>);<br>	map.<span class="hljs-built_in">put</span>(<span class="hljs-string">&quot;/js/**&quot;</span>, <span class="hljs-string">&quot;anon&quot;</span>);<br><br>	<span class="hljs-comment">// 过滤链定义，从上向下顺序执行，一般将/**放在最为下边</span><br>	<span class="hljs-comment">// 进行身份认证后才能访问</span><br>	<span class="hljs-comment">// authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问</span><br>	<span class="hljs-comment">// user指的是用户认证通过或者配置了Remember Me记住用户登录状态后可访问</span><br>	map.<span class="hljs-built_in">put</span>(<span class="hljs-string">&quot;/**&quot;</span>, <span class="hljs-string">&quot;user&quot;</span>);<br>	shiroFilterFactoryBean.<span class="hljs-built_in">setFilterChainDefinitionMap</span>(map);<br>	<span class="hljs-keyword">return</span> shiroFilterFactoryBean;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>因为对登录页面做了一些样式，新增了静态资源文件static，这时候遇到了坑，页面引用的<code>js</code>和<code>css</code>都无效了，然后发现时因为被拦截了，我们需要在Shiro的拦截器中允许对静态资源的匿名<code>anon</code>访问。</p>
+<p>注意到将<code>ShiroFilterFactoryBean</code>的<code>map.put(&quot;/**&quot;, &quot;authc&quot;);</code>更改为<code>map.put(&quot;/**&quot;, &quot;user&quot;);</code>user是指用户认证通过或配置了RememberMe记住用户登录状态后可访问。</p>
+<p>解决过程查阅了一些资料，不光光只对<code>css</code>和<code>js</code>的放开，还需要对<code>static</code>也放开</p>
+<p>对静态资源的拦截相关问题可以参照这里了解学习一下：<a target="_blank" rel="noopener" href="https://412887952-qq-com.iteye.com/blog/2392741">Spring Boot Shiro无法访问JS/CSS/IMG+自定义Filter无法访问完美方案</a></p>
+<p>回来继续，调用SimpleCookie，配置Cookie的基本属性：名称和过期时间。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * cookie对象</span><br><span class="hljs-comment"> * @return</span><br><span class="hljs-comment"> */</span><br>public SimpleCookie rememberMeCookie() &#123;<br>	<span class="hljs-operator">/</span><span class="hljs-operator">/</span> 设置cookie名称，对应login.html页面的<span class="hljs-operator">&lt;</span>input type<span class="hljs-operator">=</span>&quot;checkbox&quot; name<span class="hljs-operator">=</span>&quot;rememberMe&quot;<span class="hljs-operator">/</span><span class="hljs-operator">&gt;</span><br>	SimpleCookie cookie <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> SimpleCookie(&quot;rememberMe&quot;);<br>	<span class="hljs-operator">/</span><span class="hljs-operator">/</span> 设置cookie的过期时间，单位为秒，这里为一天<br>	cookie.setMaxAge(<span class="hljs-number">86400</span>);<br>	<span class="hljs-keyword">return</span> cookie;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>SimleCookie参数中的名称为页面的name标签属性名称。</p>
+<p>实现了Cookie对象属性配置，还需要通过<code>CookieRememberMeManager</code>进行管理起来。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * cookie管理对象</span><br><span class="hljs-comment"> * rememberMeManager()方法是生成rememberMe管理器，而且要将这个rememberMe管理器设置到securityManager中</span><br><span class="hljs-comment"> * @return</span><br><span class="hljs-comment"> */</span><br>public CookieRememberMeManager remember<span class="hljs-constructor">MeManager()</span> &#123;<br>	CookieRememberMeManager cookieRememberMeManager = <span class="hljs-keyword">new</span> <span class="hljs-constructor">CookieRememberMeManager()</span>;<br>	cookieRememberMeManager.set<span class="hljs-constructor">Cookie(<span class="hljs-params">rememberMeCookie</span>()</span>);<br>	<span class="hljs-comment">// rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)</span><br>	cookieRememberMeManager.set<span class="hljs-constructor">CipherKey(Base64.<span class="hljs-params">decode</span>(<span class="hljs-string">&quot;3AvVhmFLUs0KTA3Kprsdag==&quot;</span>)</span>);<br>	return cookieRememberMeManager;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>接下来将cookie管理对象设置到<code>SecurityManager</code>中：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">@Bean<br>public SecurityManager security<span class="hljs-constructor">Manager()</span> &#123;<br>	DefaultWebSecurityManager securityManager = <span class="hljs-keyword">new</span> <span class="hljs-constructor">DefaultWebSecurityManager()</span>;<br>	<span class="hljs-comment">// 设置realm</span><br>	securityManager.set<span class="hljs-constructor">Realm(<span class="hljs-params">authRealm</span>()</span>);<br>	<span class="hljs-comment">// 用户授权/认证信息Cache, 采用EhC//注入记住我管理器</span><br>	securityManager.set<span class="hljs-constructor">RememberMeManager(<span class="hljs-params">rememberMeManager</span>()</span>);<br>	return securityManager;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="加密处理"><a href="#加密处理" class="headerlink" title="加密处理"></a>加密处理</h3><p>《Spring Boot2(十二)：手摸手教你搭建Shiro安全框架》这个项目中用的明文，这里我们升个级，使用MD5加密</p>
+<p>新建MD5加密工具类。</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs haxe"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MD5Utils</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> final <span class="hljs-keyword">String</span> SALT = <span class="hljs-string">&quot;niaobulashi&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> final <span class="hljs-keyword">String</span> ALGORITH_NAME = <span class="hljs-string">&quot;md5&quot;</span>;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> final int HASH_ITERATIONS = <span class="hljs-number">2</span>;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">String</span> encrypt(<span class="hljs-keyword">String</span> pwd) &#123;<br>        <span class="hljs-keyword">String</span> <span class="hljs-keyword">new</span><span class="hljs-type">Password</span> = <span class="hljs-keyword">new</span> <span class="hljs-type">SimpleHash</span>(ALGORITH_NAME, pwd, ByteSource.Util.bytes(SALT), HASH_ITERATIONS).toHex();<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span><span class="hljs-type">Password</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">String</span> encrypt(<span class="hljs-keyword">String</span> username, <span class="hljs-keyword">String</span> pwd) &#123;<br>        <span class="hljs-keyword">String</span> <span class="hljs-keyword">new</span><span class="hljs-type">Password</span> = <span class="hljs-keyword">new</span> <span class="hljs-type">SimpleHash</span>(ALGORITH_NAME, pwd, ByteSource.Util.bytes(username + SALT),<br>                HASH_ITERATIONS).toHex();<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span><span class="hljs-type">Password</span>;<br>    &#125;<br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> void main(<span class="hljs-keyword">String</span>[] args) &#123;<br>        System.out.println(<span class="hljs-string">&quot;MD5加密后的密文为：&quot;</span> + MD5Utils.encrypt(<span class="hljs-string">&quot;root&quot;</span>, <span class="hljs-string">&quot;root&quot;</span>));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>其中<code>SALT</code>是加密的盐，可自行定义。</p>
+<p>main方法中，根据登录名和密码明文，输出最终加密的密文，将输出内容粘贴到我们的数据库中，待后续登录时使用。</p>
+<h3 id="新增登录页面和主页面"><a href="#新增登录页面和主页面" class="headerlink" title="新增登录页面和主页面"></a>新增登录页面和主页面</h3><p>登录页login.html</p>
+<p>添加Remember Me checkbox</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">xmlns:th</span>=<span class="hljs-string">&quot;http://www.thymeleaf.org&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>登录<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">th:href</span>=<span class="hljs-string">&quot;@&#123;/static/css/login.css&#125;&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/css&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">th:src</span>=<span class="hljs-string">&quot;@&#123;/static/js/jquery-1.11.1.min.js&#125;&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;login-page&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;form&quot;</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;用户名&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;account&quot;</span> <span class="hljs-attr">required</span>=<span class="hljs-string">&quot;required&quot;</span>/&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;password&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;密码&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;password&quot;</span> <span class="hljs-attr">required</span>=<span class="hljs-string">&quot;required&quot;</span>/&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;checkbox&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;rememberMe&quot;</span>/&gt;</span>记住我<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;login()&quot;</span>&gt;</span>登录<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">th:inline</span>=<span class="hljs-string">&quot;javascript&quot;</span>&gt;</span><span class="javascript"><span class="hljs-keyword">var</span> ctx = [[@&#123;/&#125;]];</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">th:inline</span>=<span class="hljs-string">&quot;javascript&quot;</span>&gt;</span><br><span class="javascript">    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">login</span>(<span class="hljs-params"></span>) </span>&#123;</span><br><span class="javascript">        <span class="hljs-keyword">var</span> account = $(<span class="hljs-string">&quot;input[name=&#x27;account&#x27;]&quot;</span>).val();</span><br><span class="javascript">        <span class="hljs-keyword">var</span> password = $(<span class="hljs-string">&quot;input[name=&#x27;password&#x27;]&quot;</span>).val();</span><br><span class="javascript">        <span class="hljs-keyword">var</span> rememberMe = $(<span class="hljs-string">&quot;input[name=&#x27;rememberMe&#x27;]&quot;</span>).is(<span class="hljs-string">&#x27;:checked&#x27;</span>);</span><br><span class="javascript">        $.ajax(&#123;</span><br><span class="javascript">            type: <span class="hljs-string">&quot;post&quot;</span>,</span><br><span class="javascript">            url: ctx + <span class="hljs-string">&quot;login&quot;</span>,</span><br>            data: &#123;<br><span class="javascript">                <span class="hljs-string">&quot;account&quot;</span>: account,</span><br><span class="javascript">                <span class="hljs-string">&quot;password&quot;</span>: password,</span><br><span class="javascript">                <span class="hljs-string">&quot;rememberMe&quot;</span>: rememberMe</span><br>            &#125;,<br><span class="javascript">            success: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">r</span>) </span>&#123;</span><br>                if (r.code == 100) &#123;<br><span class="javascript">                    location.href = ctx + <span class="hljs-string">&#x27;index&#x27;</span>;</span><br><span class="javascript">                &#125; <span class="hljs-keyword">else</span> &#123;</span><br>                    alert(r.message);<br>                &#125;<br>            &#125;<br>        &#125;);<br>    &#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>静态资源js和css可以在源码中查看</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/07/2309019532.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="登录页面"></p>
+<p>首页index.html</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs dust"><span class="xml"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-meta-keyword">html</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">xmlns:th</span>=<span class="hljs-string">&quot;http://www.thymeleaf.org&quot;</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span></span><br><span class="xml">    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="xml">    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>首页<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>你好！[[$</span><span class="hljs-template-variable">&#123;user.getUsername()&#125;</span><span class="xml">]]<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">th:href</span>=<span class="hljs-string">&quot;@</span></span></span><span class="hljs-template-tag">&#123;/<span class="hljs-name">logout</span>&#125;</span><span class="xml"><span class="hljs-tag"><span class="hljs-string">&quot;</span>&gt;</span>注销<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span></span><br><span class="xml"><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span></span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Controller层"><a href="#Controller层" class="headerlink" title="Controller层"></a>Controller层</h3><p>在原来的基础上，新增参数rememberMe，同时对用户名和明文密码进行MD5加密处理获得密文。</p>
+<p>登录接口</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 登录操作</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> account</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> password</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@param</span> rememberMe</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@PostMapping</span>(<span class="hljs-string">&quot;/login&quot;</span>)<br><span class="hljs-meta">@ResponseBody</span><br><span class="hljs-keyword">public</span> <span class="hljs-function">ResponseCode <span class="hljs-title">login</span><span class="hljs-params">(String account, String password, Boolean rememberMe)</span> </span>&#123;<br>	logger.info(<span class="hljs-string">&quot;登录请求-start&quot;</span>);<br>	password = MD5Utils.encrypt(account, password);<br>	Subject userSubject = SecurityUtils.getSubject();<br>	UsernamePasswordToken token = <span class="hljs-keyword">new</span> UsernamePasswordToken(account, password, rememberMe);<br>	<span class="hljs-keyword">try</span> &#123;<br>		<span class="hljs-comment">// 登录验证</span><br>		userSubject.login(token);<br>		<span class="hljs-function"><span class="hljs-keyword">return</span> ResponseCode.<span class="hljs-title">success</span><span class="hljs-params">()</span></span>;<br>	&#125; <span class="hljs-keyword">catch</span> (UnknownAccountException e) &#123;<br>		<span class="hljs-function"><span class="hljs-keyword">return</span> ResponseCode.<span class="hljs-title">error</span><span class="hljs-params">(StatusEnums.ACCOUNT_UNKNOWN)</span></span>;<br>	&#125; <span class="hljs-keyword">catch</span> (DisabledAccountException e) &#123;<br>		<span class="hljs-function"><span class="hljs-keyword">return</span> ResponseCode.<span class="hljs-title">error</span><span class="hljs-params">(StatusEnums.ACCOUNT_IS_DISABLED)</span></span>;<br>	&#125; <span class="hljs-keyword">catch</span> (IncorrectCredentialsException e) &#123;<br>		<span class="hljs-function"><span class="hljs-keyword">return</span> ResponseCode.<span class="hljs-title">error</span><span class="hljs-params">(StatusEnums.INCORRECT_CREDENTIALS)</span></span>;<br>	&#125; <span class="hljs-keyword">catch</span> (AuthenticationException e) &#123;<br>		<span class="hljs-function"><span class="hljs-keyword">return</span> ResponseCode.<span class="hljs-title">error</span><span class="hljs-params">(StatusEnums.AUTH_ERROR)</span></span>;<br>	&#125; <span class="hljs-keyword">catch</span> (Throwable e) &#123;<br>		e.printStackTrace();<br>		<span class="hljs-function"><span class="hljs-keyword">return</span> ResponseCode.<span class="hljs-title">error</span><span class="hljs-params">(StatusEnums.SYSTEM_ERROR)</span></span>;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>注销接口</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 登出</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@GetMapping</span>(<span class="hljs-string">&quot;/logout&quot;</span>)<br><span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">logout</span>(<span class="hljs-params"></span>)</span> &#123;<br>	getSubject().logout();<br>	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;login&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>启动项目，进行测试可以看到效果如下：</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/07/2305576115.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="登录操作"></p>
+<h2 id="二、验证码Kaptcha"><a href="#二、验证码Kaptcha" class="headerlink" title="二、验证码Kaptcha"></a>二、验证码Kaptcha</h2><p>kaptcha 是一个非常实用的验证码生成工具。有了它，你可以生成各种样式的验证码，因为它是可配置的。kaptcha工作的原理是调用 com.google.code.kaptcha.servlet.KaptchaServlet，生成一个图片。同时将生成的验证码字符串放到 HttpSession中。</p>
+<p>Kaptcha官网：<a target="_blank" rel="noopener" href="https://code.google.com/archive/p/kaptcha/">https://code.google.com/archive/p/kaptcha/</a></p>
+<p>使用kaptcha可以方便的配置：</p>
+<ul>
+<li>验证码的字体</li>
+<li>验证码字体的大小</li>
+<li>验证码字体的字体颜色</li>
+<li>验证码内容的范围(数字，字母，中文汉字！)</li>
+<li>验证码图片的大小，边框，边框粗细，边框颜色</li>
+<li>验证码的干扰线(可以自己继承com.google.code.kaptcha.NoiseProducer写一个自定义的干扰线)</li>
+<li>验证码的样式(鱼眼样式、3D、普通模糊……当然也可以继承com.google.code.kaptcha.GimpyEngine自定义样式)</li>
+</ul>
+<h3 id="kaptcha配置详解"><a href="#kaptcha配置详解" class="headerlink" title="kaptcha配置详解"></a>kaptcha配置详解</h3><table>
+<thead>
+<tr>
+<th>kaptcha对象属性</th>
+<th>作用</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>kaptcha.border</td>
+<td>是否有边框</td>
+<td>默认为true</td>
+</tr>
+<tr>
+<td>kaptcha.border.color</td>
+<td>边框颜色</td>
+<td>默认为Color.BLACK</td>
+</tr>
+<tr>
+<td>kaptcha.border.thickness</td>
+<td>边框粗细度</td>
+<td>默认为1</td>
+</tr>
+<tr>
+<td>kaptcha.producer.impl</td>
+<td>验证码生成器</td>
+<td>默认为DefaultKaptcha</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.impl</td>
+<td>验证码文本生成器</td>
+<td>默认为DefaultTextCreator</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.char.string</td>
+<td>验证码文本字符内容范围</td>
+<td>默认为abcde2345678gfynmnpwx</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.char.length</td>
+<td>验证码文本字符长度</td>
+<td>默认为5</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.font.names</td>
+<td>验证码文本字体样式</td>
+<td>宋体,楷体,微软雅黑，默认为new Font(“Arial”, 1, fontSize), new Font(“Courier”, 1, fontSize)</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.font.size</td>
+<td>验证码文本字符大小</td>
+<td>默认为40</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.font.color</td>
+<td>验证码文本字符颜色</td>
+<td>默认为Color.BLACK</td>
+</tr>
+<tr>
+<td>kaptcha.textproducer.char.space</td>
+<td>验证码文本字符间距</td>
+<td>默认为2</td>
+</tr>
+<tr>
+<td>kaptcha.noise.impl</td>
+<td>验证码噪点生成对象</td>
+<td>默认为DefaultNoise</td>
+</tr>
+<tr>
+<td>kaptcha.noise.color</td>
+<td>验证码噪点颜色</td>
+<td>默认为Color.BLACK</td>
+</tr>
+<tr>
+<td>kaptcha.obscurificator.impl</td>
+<td>验证码样式引擎</td>
+<td>默认为WaterRipple</td>
+</tr>
+<tr>
+<td>kaptcha.word.impl</td>
+<td>验证码文本字符渲染</td>
+<td>默认为DefaultWordRenderer</td>
+</tr>
+<tr>
+<td>kaptcha.background.impl</td>
+<td>验证码背景生成器</td>
+<td>默认为DefaultBackground</td>
+</tr>
+<tr>
+<td>kaptcha.background.clear.from</td>
+<td>验证码背景颜色渐进</td>
+<td>默认为Color.LIGHT_GRAY</td>
+</tr>
+<tr>
+<td>kaptcha.background.clear.to</td>
+<td>验证码背景颜色渐进</td>
+<td>默认为Color.WHITE</td>
+</tr>
+<tr>
+<td>kaptcha.image.width</td>
+<td>验证码图片宽度</td>
+<td>默认为200</td>
+</tr>
+<tr>
+<td>kaptcha.image.height</td>
+<td>验证码图片高度</td>
+<td>默认为50</td>
+</tr>
+</tbody></table>
+<h3 id="添加maven依赖"><a href="#添加maven依赖" class="headerlink" title="添加maven依赖"></a>添加maven依赖</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-string">&lt;!--验证码--&gt;</span><br><span class="hljs-string">&lt;dependency&gt;</span><br>	<span class="hljs-string">&lt;groupId&gt;com.github.penggle&lt;/groupId&gt;</span><br>	<span class="hljs-string">&lt;artifactId&gt;kaptcha&lt;/artifactId&gt;</span><br>	<span class="hljs-string">&lt;version&gt;2.3.2&lt;/version&gt;</span><br><span class="hljs-string">&lt;/dependency&gt;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="新增验证码图片样式配置器"><a href="#新增验证码图片样式配置器" class="headerlink" title="新增验证码图片样式配置器"></a>新增验证码图片样式配置器</h3><p>具体配置可以参考上面的<strong>kaptche配置详情</strong>，针对不同的常见配置。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">@Configuration<br>public <span class="hljs-keyword">class</span> KaptchaConfig &#123;<br><br>    @<span class="hljs-constructor">Bean(<span class="hljs-params">name</span>=<span class="hljs-string">&quot;captchaProducer&quot;</span>)</span><br>    public DefaultKaptcha get<span class="hljs-constructor">KaptchaBean()</span>&#123;<br>        DefaultKaptcha defaultKaptcha=<span class="hljs-keyword">new</span> <span class="hljs-constructor">DefaultKaptcha()</span>;<br>        Properties properties=<span class="hljs-keyword">new</span> <span class="hljs-constructor">Properties()</span>;<br>        <span class="hljs-comment">//验证码字符范围</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.textproducer.char.string&quot;</span>, <span class="hljs-string">&quot;23456789&quot;</span>)</span>;<br>        <span class="hljs-comment">//图片边框颜色</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.border.color&quot;</span>, <span class="hljs-string">&quot;245,248,249&quot;</span>)</span>;<br>        <span class="hljs-comment">//字体颜色</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.textproducer.font.color&quot;</span>, <span class="hljs-string">&quot;black&quot;</span>)</span>;<br>        <span class="hljs-comment">//文字间隔</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.textproducer.char.space&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>)</span>;<br>        <span class="hljs-comment">//图片宽度</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.image.width&quot;</span>, <span class="hljs-string">&quot;100&quot;</span>)</span>;<br>        <span class="hljs-comment">//图片高度</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.image.height&quot;</span>, <span class="hljs-string">&quot;35&quot;</span>)</span>;<br>        <span class="hljs-comment">//字体大小</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.textproducer.font.size&quot;</span>, <span class="hljs-string">&quot;30&quot;</span>)</span>;<br>        <span class="hljs-comment">//session的key</span><br>        <span class="hljs-comment">//properties.setProperty(&quot;kaptcha.session.key&quot;, &quot;code&quot;);</span><br>        <span class="hljs-comment">//长度</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.textproducer.char.length&quot;</span>, <span class="hljs-string">&quot;4&quot;</span>)</span>;<br>        <span class="hljs-comment">//字体</span><br>        properties.set<span class="hljs-constructor">Property(<span class="hljs-string">&quot;kaptcha.textproducer.font.names&quot;</span>, <span class="hljs-string">&quot;宋体,楷体,微软雅黑&quot;</span>)</span>;<br>        Config config=<span class="hljs-keyword">new</span> <span class="hljs-constructor">Config(<span class="hljs-params">properties</span>)</span>;<br>        defaultKaptcha.set<span class="hljs-constructor">Config(<span class="hljs-params">config</span>)</span>;<br>        return defaultKaptcha;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="新增图片验证码Controller层"><a href="#新增图片验证码Controller层" class="headerlink" title="新增图片验证码Controller层"></a>新增图片验证码Controller层</h3><p>是一个创建文件图片流的过程，使用ServletOutPutStream输出最后的图片。</p>
+<p>开头声明的<code>@Resource(name = &quot;captchaProducer&quot;)</code>，是验证码图片样式配置器启动时配置的Bean：<code>captchaProducer</code>。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">@Controller<br>@<span class="hljs-constructor">RequestMapping(<span class="hljs-string">&quot;/captcha&quot;</span>)</span><br>public <span class="hljs-keyword">class</span> KaptchaController &#123;<br><br>    <span class="hljs-keyword">private</span> static final Logger logger = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">LoggerFactory</span>.</span></span>get<span class="hljs-constructor">Logger(KaptchaController.<span class="hljs-params">class</span>)</span>;<br><br>    @<span class="hljs-constructor">Resource(<span class="hljs-params">name</span> = <span class="hljs-string">&quot;captchaProducer&quot;</span>)</span><br>    <span class="hljs-keyword">private</span> Producer captchaProducer;<br><br>    @<span class="hljs-constructor">GetMapping(<span class="hljs-string">&quot;/captchaImage&quot;</span>)</span><br>    public ModelAndView get<span class="hljs-constructor">KaptchaImage(HttpServletRequest <span class="hljs-params">request</span>, HttpServletResponse <span class="hljs-params">response</span>)</span> throws Exception &#123;<br>        ServletOutputStream out = response.get<span class="hljs-constructor">OutputStream()</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            HttpSession session = request.get<span class="hljs-constructor">Session()</span>;<br>            response.set<span class="hljs-constructor">DateHeader(<span class="hljs-string">&quot;Expires&quot;</span>, 0)</span>;<br>            <span class="hljs-comment">// Set standard HTTP/1.1 no-cache headers.</span><br>            response.set<span class="hljs-constructor">Header(<span class="hljs-string">&quot;Cache-Control&quot;</span>, <span class="hljs-string">&quot;no-store, no-cache, must-revalidate&quot;</span>)</span>;<br>            <span class="hljs-comment">// Set IE extended HTTP/1.1 no-cache headers (use addHeader).</span><br>            response.add<span class="hljs-constructor">Header(<span class="hljs-string">&quot;Cache-Control&quot;</span>, <span class="hljs-string">&quot;post-check=0, pre-check=0&quot;</span>)</span>;<br>            <span class="hljs-comment">// Set standard HTTP/1.0 no-cache header.</span><br>            response.set<span class="hljs-constructor">Header(<span class="hljs-string">&quot;Pragma&quot;</span>, <span class="hljs-string">&quot;no-cache&quot;</span>)</span>;<br>            <span class="hljs-comment">// return a jpeg</span><br>            response.set<span class="hljs-constructor">ContentType(<span class="hljs-string">&quot;image/jpeg&quot;</span>)</span>;<br>            <span class="hljs-comment">// create the text for the image</span><br>            String capText = captchaProducer.create<span class="hljs-constructor">Text()</span>;<br>            <span class="hljs-comment">//将验证码存到session</span><br>            session.set<span class="hljs-constructor">Attribute(Constants.KAPTCHA_SESSION_KEY, <span class="hljs-params">capText</span>)</span>;<br>            logger.info(capText);<br>            <span class="hljs-comment">// 创建一张文本图片</span><br>            BufferedImage bi = captchaProducer.create<span class="hljs-constructor">Image(<span class="hljs-params">capText</span>)</span>;<br>            <span class="hljs-comment">// 响应</span><br>            out = response.get<span class="hljs-constructor">OutputStream()</span>;<br>            <span class="hljs-comment">// 写入数据</span><br>            <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ImageIO</span>.</span></span>write(bi, <span class="hljs-string">&quot;jpg&quot;</span>, out);<br><br>            out.flush<span class="hljs-literal">()</span>;<br>        &#125; catch (Exception e) &#123;<br>            e.print<span class="hljs-constructor">StackTrace()</span>;<br>        &#125; finally &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-keyword">if</span> (out != null) &#123;<br>                    out.close<span class="hljs-literal">()</span>;<br>                &#125;<br>            &#125;<br>            catch (IOException e) &#123;<br>                e.print<span class="hljs-constructor">StackTrace()</span>;<br>            &#125;<br>        &#125;<br>        return null;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>注意最后都需要将流关闭<code>out.close()</code></p>
+<h3 id="放开图片验证码的拦截"><a href="#放开图片验证码的拦截" class="headerlink" title="放开图片验证码的拦截"></a>放开图片验证码的拦截</h3><p>重启会发现，图片验证码的接口请求无法访问，还是跳转到了localhost:8081/login登录页面</p>
+<p>因为Shiro配置的拦截器没有放开，需要再<code>ShiroConfig</code>中允许匿名访问改请求资源</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arduino">map.<span class="hljs-built_in">put</span>(<span class="hljs-string">&quot;/captcha/captchaImage**&quot;</span>, <span class="hljs-string">&quot;anon&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="登录页面添加图片验证码"><a href="#登录页面添加图片验证码" class="headerlink" title="登录页面添加图片验证码"></a>登录页面添加图片验证码</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;login-page&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;form&quot;</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;用户名&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;account&quot;</span> <span class="hljs-attr">required</span>=<span class="hljs-string">&quot;required&quot;</span>/&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;password&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;密码&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;password&quot;</span> <span class="hljs-attr">required</span>=<span class="hljs-string">&quot;required&quot;</span>/&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">label</span>&gt;</span>验证码<span class="hljs-tag">&lt;<span class="hljs-name">br</span>/&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;validateCode&quot;</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;validateCode&quot;</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;validateCode&quot;</span> <span class="hljs-attr">required</span>=<span class="hljs-string">&quot;required&quot;</span>/&gt;</span><br>                <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;javascript:void(0);&quot;</span>&gt;</span><br>                    <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/captcha/captchaImage&quot;</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;this.src=&#x27;/captcha/captchaImage?&#x27;+Math.random()&quot;</span>/&gt;</span><br>                <span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><br>            <span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">br</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;checkbox&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;rememberMe&quot;</span>/&gt;</span>记住我<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onclick</span>=<span class="hljs-string">&quot;login()&quot;</span>&gt;</span>登录<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>上面<code>div</code>为body的全部部分</p>
+<p>我在请求<code>/captcha/captchaImage</code>后面添加随机值<code>Math.random()</code>。是因为客户浏览器会缓存URL相同的资源，故使用随机数来重新请求。这和前端上线时，请求后缀都会变更一个版本号一样，不需要让客户手动刷新浏览器就可以获取最新资源一样。</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/07/2338195235.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="验证码请求"></p>
+<h3 id="修改登录请求接口"><a href="#修改登录请求接口" class="headerlink" title="修改登录请求接口"></a>修改登录请求接口</h3><p>主要是验证后台生成的验证码，与前台输入的验证码进行比较，验证是否相同</p>
+<p>这里只粘贴出验证码验证的逻辑，源码在文章最后。</p>
+<p>可以看出<code>validateCode</code>是前端请求过来的参数，先校验是否为空。</p>
+<p>然后从session中获取后台生成的验证码。</p>
+<p>最后通过比较前端输入的验证码和后台生成的是否一致。</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-comment">//1、检验验证码</span><br><span class="hljs-keyword">if</span>(validateCode<span class="hljs-operator"> == </span>null<span class="hljs-operator"> || </span>validateCode<span class="hljs-operator"> == </span><span class="hljs-string">&quot;&quot;</span>)&#123;<br>	return <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ResponseCode</span>.</span></span>error(StatusEnums.PARAM_NULL);<br>&#125;<br>Session session = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">SecurityUtils</span>.</span></span>get<span class="hljs-constructor">Subject()</span>.get<span class="hljs-constructor">Session()</span>;<br><span class="hljs-comment">//转化成小写字母</span><br>validateCode = validateCode.<span class="hljs-keyword">to</span><span class="hljs-constructor">LowerCase()</span>;<br>String v = (String) session.get<span class="hljs-constructor">Attribute(Constants.KAPTCHA_SESSION_KEY)</span>;<br><span class="hljs-comment">//还可以读取一次后把验证码清空，这样每次登录都必须获取验证码</span><br><span class="hljs-comment">//session.removeAttribute(&quot;_come&quot;);</span><br><span class="hljs-keyword">if</span>(!validateCode.equals(v))&#123;<br>	return <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ResponseCode</span>.</span></span>error(StatusEnums.VALIDATECODE_ERROR);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>下图是登录校验验证码的debug过程。</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/07/2915987549.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="kaptcha验证码校验"></p>
+<h2 id="三、源码"><a href="#三、源码" class="headerlink" title="三、源码"></a>三、源码</h2><p>源码地址：<a target="_blank" rel="noopener" href="https://github.com/niaobulashi/spring-boot-learning/tree/master/spring-boot-23-shiro-remember"><strong>spring-boot-23-shiro-remember</strong></a><br>欢迎star、fork，给作者一些鼓励</p>
+<hr>
+<p>菜鸟也要成为架构师，一起努力</p>
+<p>欢迎关注我微信公众号【鸟不拉诗】</p>
+<p>谢谢，一起学习，共同进步，成为优秀的人。</p>
+<p><img src="https://niaobulashi.com/usr/uploads/2019/07/2427016822.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="微信公众号：鸟不拉诗"></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/SpringBoot/">SpringBoot</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/07/29/2019-07-29-java-base-01/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Java基础知识回顾(一)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/07/20/2019-07-20-fileupload/">
+                        <span class="hidden-mobile">Spring Boot2(十四)：单文件上传/下载，文件批量上传</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#valine",
+          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
+          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        鄂ICP备17026246号-1
+      </a>
+    </span>
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-5VCD453CKL', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-5VCD453CKL');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

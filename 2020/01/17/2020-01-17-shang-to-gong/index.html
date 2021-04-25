@@ -1,0 +1,608 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
+  <meta name="author" content="niaobulashi">
+  <meta name="keywords" content="个人博客, 鸟不拉屎, Java, 个人博客, 鸟不拉诗">
+  
+  <title>商转公攻略 - 鸟不拉诗</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/bg.svg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="商转公攻略">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-01-17 00:00" pubdate>
+        2020年1月17日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      14
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">商转公攻略</h1>
+            
+            <div class="markdown-body">
+              <p>记录商转公的攻略流程</p>
+<p>官方获取商转公信息的渠道：<br>1、度娘  <a target="_blank" rel="noopener" href="http://www.baidu.com,/">www.baidu.com，</a><br>2、武汉得意生活：<a target="_blank" rel="noopener" href="http://www.deyi.com/thread-18155169-1-1.html%E7%AD%89%E7%9B%B8%E5%85%B3%E8%AE%BA%E5%9D%9B%E6%9C%89%E5%90%84%E7%A7%8D%E9%93%B6%E8%A1%8C%E5%95%86%E8%BD%AC%E5%85%AC%E7%9A%84%E6%94%BB%E7%95%A5">http://www.deyi.com/thread-18155169-1-1.html等相关论坛有各种银行商转公的攻略</a><br>3、百度经验：<a target="_blank" rel="noopener" href="https://jingyan.baidu.com/article/4853e1e5a25eb51909f726d6.html">https://jingyan.baidu.com/article/4853e1e5a25eb51909f726d6.html</a><br>4、武汉公积金官网贷款业务部分<a target="_blank" rel="noopener" href="http://gjj.wuhan.gov.cn/html/ywzn/dkyw/index.html">http://gjj.wuhan.gov.cn/html/ywzn/dkyw/index.html</a><br>5、武汉公积金官方公众号：【武汉公积金】（任何有关公积金事宜可以咨询人工服务）<br>6、武汉城市留言板：<a target="_blank" rel="noopener" href="http://liuyan.cjn.cn/threads/list?fid=9%E5%A6%82%E6%9E%9C%E9%93%B6%E8%A1%8C%E6%95%85%E6%84%8F%E5%80%9F%E5%8F%A3%E6%8B%96%E5%BB%B6%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%9C%A8%E6%AD%A4%E7%BD%91%E7%AB%99%E6%8A%95%E8%AF%89%EF%BC%8C%E5%BE%88%E6%9C%89%E6%95%88%E6%9E%9C">http://liuyan.cjn.cn/threads/list?fid=9如果银行故意借口拖延，可以在此网站投诉，很有效果</a><br>7、武汉公积金APP：可以查看贷款进度、贷款额度试算以及自己发现的其他功能</p>
+<p>基本上只要认真搜索了以上信息来源的，百分之九十的问题可以找到答案</p>
+<p>以下是当代万国城我们这一批四个人的商转公流程：</p>
+<p>注：商转公无需提前还完装修贷，必须在武汉缴纳的公积金</p>
+<p>商转公前提：房产证（必须）</p>
+<p>需准备的资料：<br>1、到开发商B某那里领取四张办房产证所需的证明（申请表、宗地图、分户图、不动产权属证明），最好都提前复印一份留存<br>2、购房合同原件<br>3、身份证原件及复印件（最好自己提前复印，节约时间）<br>4、户口本及户主页和自己那一页的复印件<br>5、购房发票原件（记得是两张，发票最高面额只有100万，我们是一共两张）<br>6、维修基金交存发票（这个要找物业拿的）<br>7、银行卡（预存总房款（毛坯总价）的1.5%）<br>8、准备一百的现金，在办理完所有的手续以后邮寄的时候需要交纳现金</p>
+<p>提前到中国银行显正支行（地图导航或者直接一个滴滴）去办理房产证办理登记，等银行通知短信以后，早点到房管所（房管所据说不在墨水湖了，要自己搜位置）排队（我是7点去的，排第三，速度还蛮快）</p>
+<p>第一步：商转公申请</p>
+<p>需准备的资料：<br>1、房产证原件<br>2、贷款合同原件（最好先复印一份，有备无患）<br>3、夫妻双方收入证明（需要找公司开，模板可以在网上下载一个，没有格式限制，主要看公司的公章）<br>4、夫妻双方征信报告（<a target="_blank" rel="noopener" href="http://www.sohu.com/a/298015578_223290%EF%BC%89%EF%BC%8C%E8%AF%A5%E7%BD%91%E7%AB%99%E6%98%AF%E6%AD%A6%E6%B1%89%E5%BE%81%E4%BF%A1%E6%8A%A5%E5%91%8A%E8%87%AA%E5%8A%A9%E6%9F%A5%E8%AF%A2%E6%89%93%E5%8D%B0%E6%9C%BA%E7%9A%84%E7%9B%B8%E5%85%B3%E5%9C%B0%E5%9D%80%EF%BC%8C%E5%8F%AA%E9%9C%80%E8%A6%81%E6%90%BA%E5%B8%A6%E8%BA%AB%E4%BB%BD%E8%AF%81%E5%B0%B1%E5%8F%AF%E4%BB%A5%E5%8E%BB%E6%89%93%E5%8D%B0%E4%BA%86%EF%BC%8C%E7%8E%B0%E5%9C%A8%E6%AF%94%E4%BB%A5%E5%89%8D%E5%BF%AB%E5%A4%9A%E4%BA%86%EF%BC%8C%E4%B8%8D%E9%9C%80%E8%A6%81%E6%8E%92%E9%98%9F">http://www.sohu.com/a/298015578_223290），该网站是武汉征信报告自助查询打印机的相关地址，只需要携带身份证就可以去打印了，现在比以前快多了，不需要排队</a><br>5、夫妻双方银行流水（打印工资卡的银行流水，最好是一年，加盖银行柜面专用章，别搞错了）</p>
+<p>时间：提前跟买房时的贷款经理约好哪天，确定有人了再去<br>地点：中国银行汉阳支行二楼（上二楼需要登记）<br>人物：我们是A经理，不知道到时候你们的贷款经理是谁<br>流程：带好上述资料，跟着银行的经理操作就OK了，此时已完成第一步的商转公申请</p>
+<p>第二步：实时关注公积金APP的贷款进度流程图，一直到复审</p>
+<p>在未到复审之前都不用去银行</p>
+<p>第三步：办理担保<br>需准备的资料：<br>1、提前交存差额到银行卡内<br>2、房产证原件<br>3、去银行领取两张申请表<br>4、身份证原件及复印件<br>5、户口本原件及复印件（户主及本人页）<br>6、准备1400的担保费</p>
+<p>时间：等贷款经理给你打电话，确定好日期后到银行领取两张申请表<br>地点：中国银行汉阳支行二楼（上二楼需要登记）<br>人物：我们是A经理，不知道到时候你们的贷款经理是谁<br>流程：到银行领取申请表后直接打车去香港路的外贸大厦，上四楼到武汉担保公司，根据现场要求流程进行填表</p>
+<p>第四步：等公积金中心终审、银行进行抵押、公积金委托银行放款</p>
+<p>在放款之前都不用去银行，坐等就行了，主要就是催银行的人办的积极点</p>
+<p>第五步：公积金中心流程显示放款之后去开户行开新卡<br>需准备的资料：<br>1、身份证<br>2、中国银行借记卡（储蓄卡）</p>
+<p>时间：等开户行办理业务人员给你打电话，确定好日期后<br>地点：中国银行墨水湖支行一楼柜台<br>人物：给你打电话的业务人员<br>流程：主要是去新开一张卡，这张卡的作用是公积金将钱打进这张卡内，此卡不要随意存取款</p>
+<p>第六步：公积金放款到新卡后（一般一天就到账了），到显正支行办理结清手续<br>需准备的资料：<br>1、能带的都带上</p>
+<p>时间：提前跟显正支行的人员联系，一般到账以后就可以去办理，无需预约<br>地点：中国银行显正支行<br>人物：找到相应窗口办理即可<br>流程：依据窗口人员办理即可</p>
+<p>第七步：后面还有委托扣划、再抵押赎回房产证等步骤，  未完待续………</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Life/">Life</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/01/18/2020-01-18-oracle-connect/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">解决Oracle服务端1521端口无法telnet，服务名未开启监听问题</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/01/13/2020-01-13-linux-mutli-tomcat/">
+                        <span class="hidden-mobile">linux 同时启动多个tomcat</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#valine",
+          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
+          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        鄂ICP备17026246号-1
+      </a>
+    </span>
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-5VCD453CKL', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-5VCD453CKL');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
