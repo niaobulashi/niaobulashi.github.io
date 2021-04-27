@@ -554,19 +554,18 @@ StringBuffer/StringBuilder对象的值是可以改变的，并且值改变以后
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2018/05/30/2018-05-30-exception/">谈谈你对Java异常处理机制的理解？</a>
+        <a href="/2018/05/30/2018-05-30-think-java/">谈谈你对 Java 平台的理解?</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2018/05/30/2018-05-30-exception/">
+        <a href="/2018/05/30/2018-05-30-think-java/">
           
           
             
           
-          先谈谈我的理解：异常处理机制可以说是让我们编写的程序运行起来更加的健壮，无论是在程序调试、运行期间发生的异常情况的捕获，都提供的有效的补救动作，任何业务逻辑都会存在异常情况，这时只需要记录这些异常情况，抛出异常，绝不能生吞异常，不要再finally中处理返回值。
-先丢个问题：请对比 Exception 和 Error，另外，运行时异常与一般异常有什么区别？
-
-经典回答Exception 和 Err
+          先谈谈我的理解：
+一次编译，永久执行。依赖于jre的运行环境，jdk提供核心类库，java源代码经过javac编译为.class文件，.class文件经过JVM解析或编译运行，无需过多关心不同操作系统的差异性。
+典型回答Java 本身是一种面向对象的语言，最显著的特性有两个方面，一是所谓的“书写一次，到处运行”（Write once, run anywhere），能够非常容易地获得跨平台能力；另外
         </a>
       </p>
 
@@ -605,18 +604,19 @@ StringBuffer/StringBuilder对象的值是可以改变的，并且值改变以后
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2018/05/30/2018-05-30-think-java/">谈谈你对 Java 平台的理解?</a>
+        <a href="/2018/05/30/2018-05-30-exception/">谈谈你对Java异常处理机制的理解？</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2018/05/30/2018-05-30-think-java/">
+        <a href="/2018/05/30/2018-05-30-exception/">
           
           
             
           
-          先谈谈我的理解：
-一次编译，永久执行。依赖于jre的运行环境，jdk提供核心类库，java源代码经过javac编译为.class文件，.class文件经过JVM解析或编译运行，无需过多关心不同操作系统的差异性。
-典型回答Java 本身是一种面向对象的语言，最显著的特性有两个方面，一是所谓的“书写一次，到处运行”（Write once, run anywhere），能够非常容易地获得跨平台能力；另外
+          先谈谈我的理解：异常处理机制可以说是让我们编写的程序运行起来更加的健壮，无论是在程序调试、运行期间发生的异常情况的捕获，都提供的有效的补救动作，任何业务逻辑都会存在异常情况，这时只需要记录这些异常情况，抛出异常，绝不能生吞异常，不要再finally中处理返回值。
+先丢个问题：请对比 Exception 和 Error，另外，运行时异常与一般异常有什么区别？
+
+经典回答Exception 和 Err
         </a>
       </p>
 
