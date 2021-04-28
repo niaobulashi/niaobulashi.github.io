@@ -253,8 +253,7 @@
             <h1 style="display: none">秒杀业务方案思路</h1>
             
             <div class="markdown-body">
-              <p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210428142339.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload></p>
-<p>秒杀业务最大的业务特点，短时间内，高并发，大量读请求，大量的写请求。如果不经任何优化，直接将全部读写请求打到数据库层，数据库层由于锁冲突，特别是热点数据行锁冲突，很容易造成死锁，降低数据库执行效率。而且流量很大的情况，很容易将会把数据库压死。数据库层若挂了，如果再次启动，很可能又会被大流量再次压垮。</p>
+              <p>秒杀业务最大的业务特点，短时间内，高并发，大量读请求，大量的写请求。如果不经任何优化，直接将全部读写请求打到数据库层，数据库层由于锁冲突，特别是热点数据行锁冲突，很容易造成死锁，降低数据库执行效率。而且流量很大的情况，很容易将会把数据库压死。数据库层若挂了，如果再次启动，很可能又会被大流量再次压垮。</p>
 <p>从系统的角度来看，在秒杀业务的情况下，我们要保护数据层的安全。 </p>
 <p>为了保证数据库的安全，我们就要降低最后到达数据库层读写流量，使其一直处于安全的情况下运行。 </p>
 <p>从读写方向，优化思路： </p>
@@ -264,6 +263,7 @@
 </ul>
 <p>降低数据层读请求，主要办法就是加缓存，数据优先读取缓存，缓存不存在再从数据库层读取。缓存解决办法比较多，下面主要介绍降写的处理办法。 </p>
 <p>降低数据层写请求，我们就必须在上游应用层过滤写清求。 </p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210428142339.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload></p>
 <h2 id="技术优化手段"><a href="#技术优化手段" class="headerlink" title="技术优化手段"></a>技术优化手段</h2><p>假设我们的系统架构如下： </p>
 <p>网站/APP—-&gt;站点接入应用——&gt;后台服务—-&gt;数据库层 </p>
 <p>我们可以在这三层做优化，拦截写请求，降低数据层写压力。 </p>
