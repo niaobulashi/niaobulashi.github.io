@@ -6,7 +6,7 @@
   <link href="https://niaobulashi.com/atom.xml" rel="self"/>
   
   <link href="https://niaobulashi.com/"/>
-  <updated>2021-04-26T04:40:33.566Z</updated>
+  <updated>2021-04-28T06:24:26.332Z</updated>
   <id>https://niaobulashi.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>秒杀业务方案思路</title>
+    <link href="https://niaobulashi.com/2021/04/28/2021-04-28-miao-sha-ye-wu/"/>
+    <id>https://niaobulashi.com/2021/04/28/2021-04-28-miao-sha-ye-wu/</id>
+    <published>2021-04-28T06:24:30.000Z</published>
+    <updated>2021-04-28T06:24:26.332Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;\assets\css\APlayer.min.css&quot;&gt;&lt;script src=&quot;\assets\js\APlayer.min.js&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="工作笔记" scheme="https://niaobulashi.com/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="秒杀业务" scheme="https://niaobulashi.com/tags/%E7%A7%92%E6%9D%80%E4%B8%9A%E5%8A%A1/"/>
+    
+  </entry>
   
   <entry>
     <title>逛一逛大唐芙蓉园</title>
@@ -71,7 +96,7 @@
     <link href="https://niaobulashi.com/2021/04/23/2021-04-23-zui-jin-cheng-mi-you-xi/"/>
     <id>https://niaobulashi.com/2021/04/23/2021-04-23-zui-jin-cheng-mi-you-xi/</id>
     <published>2021-04-23T07:30:30.000Z</published>
-    <updated>2021-04-25T06:18:26.836Z</updated>
+    <updated>2021-04-27T11:13:09.405Z</updated>
     
     
       
@@ -96,7 +121,7 @@
     <link href="https://niaobulashi.com/2021/04/23/2021-04-23-lao-jia-tong-cheng/"/>
     <id>https://niaobulashi.com/2021/04/23/2021-04-23-lao-jia-tong-cheng/</id>
     <published>2021-04-23T03:12:30.000Z</published>
-    <updated>2021-04-25T06:21:13.283Z</updated>
+    <updated>2021-04-27T11:12:51.467Z</updated>
     
     
       
@@ -492,33 +517,6 @@
     <category term="Java" scheme="https://niaobulashi.com/tags/Java/"/>
     
     <category term="Mysql" scheme="https://niaobulashi.com/tags/Mysql/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何理解多租户架构？</title>
-    <link href="https://niaobulashi.com/2020/11/19/2020-11-19-multi-tenancy-framework/"/>
-    <id>https://niaobulashi.com/2020/11/19/2020-11-19-multi-tenancy-framework/</id>
-    <published>2020-11-18T16:00:00.000Z</published>
-    <updated>2021-04-20T01:57:14.169Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;\assets\css\APlayer.min.css&quot;&gt;&lt;script src=&quot;\assets\js\APlayer.min.js&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="工作笔记" scheme="https://niaobulashi.com/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/"/>
-    
-    
-    <category term="Java" scheme="https://niaobulashi.com/tags/Java/"/>
-    
-    <category term="多租户" scheme="https://niaobulashi.com/tags/%E5%A4%9A%E7%A7%9F%E6%88%B7/"/>
     
   </entry>
   
