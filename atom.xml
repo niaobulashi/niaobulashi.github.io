@@ -6,7 +6,7 @@
   <link href="https://niaobulashi.com/atom.xml" rel="self"/>
   
   <link href="https://niaobulashi.com/"/>
-  <updated>2021-04-29T01:33:57.438Z</updated>
+  <updated>2021-04-29T03:02:14.251Z</updated>
   <id>https://niaobulashi.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>下班去大雁塔溜达</title>
+    <link href="https://niaobulashi.com/2021/04/29/2021-04-29-xia-ban-qu-da-tang/"/>
+    <id>https://niaobulashi.com/2021/04/29/2021-04-29-xia-ban-qu-da-tang/</id>
+    <published>2021-04-29T02:24:30.000Z</published>
+    <updated>2021-04-29T03:02:14.251Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;\assets\css\APlayer.min.css&quot;&gt;&lt;script src=&quot;\assets\js\APlayer.min.js&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="生活随笔" scheme="https://niaobulashi.com/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
+    
+    
+    <category term="Life" scheme="https://niaobulashi.com/tags/Life/"/>
+    
+  </entry>
   
   <entry>
     <title>秒杀业务方案思路</title>
@@ -490,33 +515,6 @@
     
     
     <category term="Life" scheme="https://niaobulashi.com/tags/Life/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Mysql索引类型如何选择？</title>
-    <link href="https://niaobulashi.com/2020/11/25/2020-11-25-select-mysql-index/"/>
-    <id>https://niaobulashi.com/2020/11/25/2020-11-25-select-mysql-index/</id>
-    <published>2020-11-24T16:00:00.000Z</published>
-    <updated>2021-04-20T01:56:58.740Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;\assets\css\APlayer.min.css&quot;&gt;&lt;script src=&quot;\assets\js\APlayer.min.js&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="程序笔记" scheme="https://niaobulashi.com/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/"/>
-    
-    
-    <category term="Java" scheme="https://niaobulashi.com/tags/Java/"/>
-    
-    <category term="Mysql" scheme="https://niaobulashi.com/tags/Mysql/"/>
     
   </entry>
   
