@@ -199,19 +199,19 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2019/06/28/2019-06-28-myproject-niaobulashi/">Spring Boot2版的权限管理系统</a>
+        <a href="/2019/04/17/2019-04-17-java-war-filePath/">打包成war包之后如何读取配置文件</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2019/06/28/2019-06-28-myproject-niaobulashi/">
+        <a href="/2019/04/17/2019-04-17-java-war-filePath/">
           
           
             
           
-          github项目地址：https://github.com/niaobulashi/niaobulashi
-springboot学习地址：http://www.ityouknow.com/spring-boot.html
-shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
-在线演示地址：http://manage.niaobula
+          今天工作开发中遇到一个问题：在idea运行的项目读取配置文件没有问题，打包成war包之后就会报错java.io.FileNotFoundException: class path resource
+
+原因打包成war包后，配置文件在war包中，不是一个独立的文件了，无法通过File的方式访问
+123String filePath = &quot;classpath:template_xml/rea
         </a>
       </p>
 
@@ -219,8 +219,8 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2019-06-28 00:00" pubdate>
-              2019-06-28
+            <time datetime="2019-04-17 00:00" pubdate>
+              2019-04-17
             </time>
           </div>
         
@@ -228,7 +228,7 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+              <a href="/categories/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">问题记录</a>
             
           </div>
         
@@ -236,7 +236,7 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/SpringBoot/">SpringBoot</a>
+              <a href="/tags/Java/">Java</a>
             
           </div>
         
@@ -250,19 +250,18 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2019/06/28/2019-06-28-mybatis-2levelcache/">Spring Boot2(二)：使用Spring Boot2集成Mybatis缓存机制</a>
+        <a href="/2019/04/16/2019-04-16-oracle-TimeOut/">ORA-02049：oracle超时分布式事务处理等待锁</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2019/06/28/2019-06-28-mybatis-2levelcache/">
+        <a href="/2019/04/16/2019-04-16-oracle-TimeOut/">
           
           
             
           
-          学习SpringBoot集成Mybatis的第二章，了解到Mybatis自带的缓存机制，在部署的时候踩过了一些坑。在此记录和分享一下Mybatis的缓存作用。
- 本文章的源码再文章末尾
-什么是查询缓存MyBatis有一级缓存和二级缓存。记录可以看下这篇博文：
-一级缓存首先看一下什么是一级缓存，一级缓存是指SqlSession。一级缓存的作用域是一个SqlSession。Mybatis默认开启一级缓
+          查询死锁信息1234567SELECT username,       lockwait,       status,       machine,       program  FROM v$session WHERE sid IN (SELECT session_id FROM v$locked_object);
+
+查找被锁的SQL语句123456SELECT sql_text  FROM v
         </a>
       </p>
 
@@ -270,8 +269,8 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2019-06-28 00:00" pubdate>
-              2019-06-28
+            <time datetime="2019-04-16 00:00" pubdate>
+              2019-04-16
             </time>
           </div>
         
@@ -279,7 +278,7 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
+              <a href="/categories/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">问题记录</a>
             
           </div>
         
@@ -287,11 +286,7 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/SpringBoot/">SpringBoot</a>
-            
-              <a href="/tags/Mybatis/">Mybatis</a>
-            
-              <a href="/tags/Cache/">Cache</a>
+              <a href="/tags/Oracle/">Oracle</a>
             
           </div>
         
@@ -305,16 +300,21 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2019/06/27/2019-06-27-mybatis-cache/">聊聊MyBatis缓存机制</a>
+        <a href="/2019/04/05/2019-04-05-tomorrow-to-guangzhou/">明天走起，飞广州</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2019/06/27/2019-06-27-mybatis-cache/">
+        <a href="/2019/04/05/2019-04-05-tomorrow-to-guangzhou/">
           
           
             
           
-          MyBatis是常见的Java数据库访问层框架。在日常工作中，开发人员多数情况下是使用MyBatis的默认缓存配置，但是MyBatis缓存机制有一些不足之处，在使用中容易引起脏数据，形成一些潜在的隐患。个人在业务开发中也处理过一些由于MyBatis缓存引发的开发问题，带着个人的兴趣，希望从应用及源码的角度为读者梳理MyBatis缓存机制。官方说明：MyBatis Spring-Boot-Start
+          明天4点半起床，或者更早4点半出发，飞往广州
+才3天假期，国务院怎么不早点公布5月1号的放假计划，有4天无奈早就买好了飞机票，不然就5月出行了
+这里有点坑，飞机票的改票或者退票，只退给你50块钱的油钱？？ ::aru:despise::合着我600多买的飞机票，要改票或者退票，只退50 ::aru:cryingface:: 
+两个月去两次广州，这谁抗得住啊！经济不允许我这么干啊
+
+
         </a>
       </p>
 
@@ -322,233 +322,8 @@ shiro学习地址：https://jinnianshilongnian.iteye.com/blog/2018398
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2019-06-27 00:00" pubdate>
-              2019-06-27
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/SpringBoot/">SpringBoot</a>
-            
-              <a href="/tags/Mybatis/">Mybatis</a>
-            
-              <a href="/tags/Cache/">Cache</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2019/06/26/2019-06-26-mybatis-hello/">Spring Boot2(一)：使用Spring Boot2集成Mybatis基础搭建</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2019/06/26/2019-06-26-mybatis-hello/">
-          
-          
-            
-          
-          Mybatis 初期使用比较麻烦，需要各种配置文件、实体类、Dao 层映射关联、还有一大推其它配置。mybatis-spring-boot-starter 就是 Spring Boot+ Mybatis 可以完全注解不用配置文件，也可以简单配置轻松上手。
-mybatis-spring-boot-starter官方说明：MyBatis Spring-Boot-Starter will help yo
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2019-06-26 00:00" pubdate>
-              2019-06-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/SpringBoot/">SpringBoot</a>
-            
-              <a href="/tags/Mybatis/">Mybatis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2019/06/21/2019-06-21-Strawberry-Music-Festival/">2019西安草莓音乐节-周六这么过</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2019/06/21/2019-06-21-Strawberry-Music-Festival/">
-          
-          
-            
-          
-          还记得3年前在武汉的时候，去的武汉的草莓音乐节。今年刚好在西安也举办了草莓音乐节，丝毫没有犹豫。
-冲鸭
-
-
-
-
-
-
-
-举办场地在西安的大明宫国家遗址公园，公园相当之大，举办这种音乐节相当合适不过了现场安全措施也相当到位，保安，消防，警察都就位了。给你们点赞！可以说现场听音乐和平时还是很不一样的
-emmm，悄咪咪的拍了这张，太可爱了吧 ::aru:clap:: 
-
-当热门歌手要出场的时候，现场异常的
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2019-06-21 00:00" pubdate>
-              2019-06-21
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/life/">life</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2019/05/15/2019-05-15-wedding-photos/">端午期间把婚纱照给拍了</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2019/05/15/2019-05-15-wedding-photos/">
-          
-          
-            
-          
-          就在2019年的端午那天
-我俩在西安把婚纱照拍了
-从大一下学期认识你，到现在，算下来有7年了
-一路下来挺不容易的，非常珍惜
-时间过得太快了，很多事情来不及写下来，时间就过去了
-我开玩笑说我老了肯定得老年痴呆，许多事情还得靠你来细细叙说
-拍照拍了一天，早上5点半起床，7点半开始化妆拍照，拍到晚上8点。也算完成了一件大事
-人生有许许多多重大事情需要经历
-婚姻只有一次，我喜欢给你最好的一次
-昨天效果照片
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2019-05-15 00:00" pubdate>
-              2019-05-15
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-category"></i>
-            
-              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
-            
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Life/">Life</a>
-            
-              <a href="/tags/Love/">Love</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2019/05/09/2019-05-09-qingming-to-guangzhou/">2019年清明节广州之旅(多图预警)</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2019/05/09/2019-05-09-qingming-to-guangzhou/">
-          
-          
-            
-          
-          
-本来清明节回来，就来写的，可是呢emmmm，可能有点懒吧。一直没有静下心来好好写点了
-
-出发~宿舍到机场西安市区没有机场，只有咸阳有个咸阳机场。去机场也没有地铁，只有机场大巴，从这边坐机场大巴过去要1个小时。所以如果是9点的飞机，从宿舍去大巴骑单车要10分钟，大巴大约25分钟一趟。。这不敢保证一去就有大巴可以走 ::aru:sweat:: 大巴出发去机场还有1个小时，到机场了也至少需要保证有一个
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2019-05-09 00:00" pubdate>
-              2019-05-09
+            <time datetime="2019-04-05 00:00" pubdate>
+              2019-04-05
             </time>
           </div>
         
@@ -578,23 +353,20 @@ emmm，悄咪咪的拍了这张，太可爱了吧 ::aru:clap::
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2019/04/26/2019-04-26-java-interview/">Oracle常用SQL语句工作总结（持续更新中）</a>
+        <a href="/2019/03/26/2019-03-26-google-extensions/">自用谷歌插件推荐</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2019/04/26/2019-04-26-java-interview/">
+        <a href="/2019/03/26/2019-03-26-google-extensions/">
           
           
             
           
-          加油吧，骚年！首先直接来一个github上star最多的Java相关基础知识的学习大纲，超级全面，避免了导出找资料的繁琐。相当nice!
-JavaGuide
-可以说相当有用了
-其他的内容是相关看到的Java相关知识，也是万能的网友的博客，在这里引用归总起来
-Java1.java int与integer的区别
-2.java 自动装箱与拆箱
-3.java中 == 与 equal 的区别
-4.java集
+          分享一波自用的谷歌插件这是我目前浏览器用的插件(ฅ´ω`ฅ)
+有几个值得推荐下
+1、tampermonkey 油猴无需解释，简直不能太牛逼了
+推荐一些优秀方便的脚本https://greasyfork.org/zh-CN/scripts
+2、Chrono下载管理器 浏览器下载文件管理，很是方便https://cdn.jsdelivr.net/gh/niaobulashi/images@main/n
         </a>
       </p>
 
@@ -602,8 +374,160 @@ Java1.java int与integer的区别
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2019-04-26 00:00" pubdate>
-              2019-04-26
+            <time datetime="2019-03-26 00:00" pubdate>
+              2019-03-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Google/">Google</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2019/03/25/2019-03-25-java-concurrency/">Java并发知识图谱</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/03/25/2019-03-25-java-concurrency/">
+          
+          
+            
+          
+          
+
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-03-25 00:00" pubdate>
+              2019-03-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">Java</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2019/03/24/2019-03-24-May-Day/">喜大普奔喜大普奔，五一调休4天啊啊啊</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/03/24/2019-03-24-May-Day/">
+          
+          
+            
+          
+          国务院发布新消息
+国务院办公厅关于调整2019年劳动节假期安排的通知
+
+各省、自治区、直辖市人民政府，国务院各部委、各直属机构：
+经国务院批准，现将调整2019年劳动节放假安排通知如下。
+一、2019年5月1日至4日放假调休，共4天。4月28日（星期日）、5月5日（星期日）上班。
+二、各地区、各部门要抓紧做好本地区、本领域的劳动节假期调整落实工作，采取有效措施，保障交通运力，加强旅游服务，丰富产品
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-03-24 00:00" pubdate>
+              2019-03-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Life/">Life</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2019/03/23/2019-03-23-stop-learn-struct/">看到一篇文章《停止学习框架》</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/03/23/2019-03-23-stop-learn-struct/">
+          
+          
+            
+          
+          知乎译文地址：https://zhuanlan.zhihu.com/p/52814937原文地址：http://link.zhihu.com/?target=https%3A//sizovs.net/2018/12/17/stop-learning-frameworks/
+感受颇深，框架是为了方便开发项目拿来现成用的。只要你知道这套框架的开发步骤、规范，就知道如何开发了。其他的无非就是一些java
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-03-23 00:00" pubdate>
+              2019-03-23
             </time>
           </div>
         
@@ -619,9 +543,7 @@ Java1.java int与integer的区别
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/Java/">Java</a>
-            
-              <a href="/tags/Oracle/">Oracle</a>
+              <a href="/tags/Life/">Life</a>
             
           </div>
         
@@ -635,18 +557,18 @@ Java1.java int与integer的区别
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2019/04/25/2019-04-25-oracle-sql/">Oracle常用SQL语句工作总结（持续更新中）</a>
+        <a href="/2019/03/22/2019-03-22-JavaScript-isnotnull/">JavaScript判断对象是否是NULL</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2019/04/25/2019-04-25-oracle-sql/">
+        <a href="/2019/03/22/2019-03-22-JavaScript-isnotnull/">
           
           
             
           
-          主要是记录工作中遇到的一些各种’常用’和’变态’的SQL语句(๑•̀ㅁ•́ฅ)
-
-查询1.统计成功失败总数123456789select sum(正确数)+sum(错误数) as 总记录数,sum(正确数),sum(错误数)from (    select count(1) 正确数,0 错误数    from tb    where status=1union all     select 0 正
+          写js经常会遇到非空判断
+自己没有做总结，特地转载。很有帮助
+12345678910111213function isEmpty(obj) &#123;// 检验 undefined 和 null    if (!obj &amp;&amp; obj !== 0 &amp;&amp; obj !== &#x27;&#x27;) &#123;        return true;    &#125
         </a>
       </p>
 
@@ -654,8 +576,8 @@ Java1.java int与integer的区别
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2019-04-25 00:00" pubdate>
-              2019-04-25
+            <time datetime="2019-03-22 00:00" pubdate>
+              2019-03-22
             </time>
           </div>
         
@@ -663,7 +585,7 @@ Java1.java int与integer的区别
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+              <a href="/categories/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">问题记录</a>
             
           </div>
         
@@ -672,8 +594,6 @@ Java1.java int与integer的区别
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/Java/">Java</a>
-            
-              <a href="/tags/Oracle/">Oracle</a>
             
           </div>
         
@@ -687,21 +607,18 @@ Java1.java int与integer的区别
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2019/04/24/2019-04-24-java-excel/">Java处理excel时遇到的一些问题及总结</a>
+        <a href="/2019/03/21/2019-03-21-rizhi/">2019年3月份日志</a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2019/04/24/2019-04-24-java-excel/">
+        <a href="/2019/03/21/2019-03-21-rizhi/">
           
           
             
           
-          
-最近的开发过程中遇到需要导出excel，以及导入解析excel的需求需要先导出excel，修改之后，再用该excel导入处理
-
-
-poi无法解析ooxml格式excel遇到了第一个问题，poi无法解析ooxml格式的excel文件，poi是apache解析excel文件以及相关操作的jar包。当时平台导出的excel格式文件，无法导入解析，总是报错
-1java.io.IOException: I
+          20190301 周五3月第一天，周五，一到周五就感觉轻松了许多，飘得很。 ::aru:tongue:: 再忙也不觉得心累哈哈哈哈然而临近下班时，生产出现了问题，(´இ皿இ｀)得加会班了。
+20190302-20190303 周末额，周末两天刚好育碧的全境封锁2开放测试，都在玩去了φ(￣∇￣o)，真好玩哈哈哈哈哈，果断预购了，买的标准版，使用100金币打8折，折后240多软妹币
+20190304 
         </a>
       </p>
 
@@ -709,8 +626,8 @@ poi无法解析ooxml格式excel遇到了第一个问题，poi无法解析ooxml�
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2019-04-24 00:00" pubdate>
-              2019-04-24
+            <time datetime="2019-03-21 00:00" pubdate>
+              2019-03-21
             </time>
           </div>
         
@@ -718,7 +635,7 @@ poi无法解析ooxml格式excel遇到了第一个问题，poi无法解析ooxml�
           <div class="post-meta mr-3">
             <i class="iconfont icon-category"></i>
             
-              <a href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
+              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
             
           </div>
         
@@ -726,7 +643,162 @@ poi无法解析ooxml格式excel遇到了第一个问题，poi无法解析ooxml�
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/Java/">Java</a>
+              <a href="/tags/Life/">Life</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2019/03/01/2019-03-01-steamplus1/">日常喜加一</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/03/01/2019-03-01-steamplus1/">
+          
+          
+            
+          
+          
+steam日常喜加一
+男生逛steam堪比女生逛化妆店。
+shut up and take my money
+8说了，开冲
+
+
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-03-01 00:00" pubdate>
+              2019-03-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Life/">Life</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2019/02/28/2019-02-28-wtf01/">收到这样的报文，你做何感想</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/02/28/2019-02-28-wtf01/">
+          
+          
+            
+          
+          和另外一个项目组做接口对接，看下他们处理返回的报文。
+其中有一个是null，却当成字符串 ::aru:blood:: 
+
+
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-02-28 00:00" pubdate>
+              2019-02-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Life/">Life</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2019/02/20/2019-02-20-go-grilfriend-home/">去女朋友家过年</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2019/02/20/2019-02-20-go-grilfriend-home/">
+          
+          
+            
+          
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;好久没来看博客了，博客的邮箱用的QQ邮箱，由于有定期修改QQ密码的习惯，导致忘记修改博客的邮箱提醒的QQ的密码，以为没有人来看，进来一看，有写留言，还是感觉挺开心的。
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;今年春节是在女朋友家去过年的，也是第二次去女朋友家，第一次还是
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-02-20 00:00" pubdate>
+              2019-02-20
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/">生活随笔</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Life/">Life</a>
             
           </div>
         
@@ -738,7 +810,7 @@ poi无法解析ooxml格式excel遇到了第一个问题，poi无法解析ooxml�
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/6/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/#board">8</a><a class="page-number" href="/page/9/#board">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/#board">14</a><a class="extend next" rel="next" href="/page/8/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/page/6/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/#board">8</a><a class="page-number" href="/page/9/#board">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/#board">12</a><a class="extend next" rel="next" href="/page/8/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
