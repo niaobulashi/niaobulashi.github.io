@@ -1,259 +1,159 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>性能调优-Mysql索引数据结构详解与索引优化 | 鸟不拉诗</title><meta name="keywords" content="Java,Mysql"><meta name="author" content="鸟不拉诗"><meta name="copyright" content="鸟不拉诗"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="最近报名了图灵学院的架构专题的付费课程，没有赶上6月份开课，中途加入的。错过了多线程的直播课程，只能看录播了😭。从性能调优正式开始，视频学习，对自己很有帮助。对自己的学习进行投资是最有用的投资。加油！  本篇文章主要学习了MySQL的索引的数据结构和不同类型索引的认识，做一个大概的了解学习总结。 一、索引在关系数据库中，索引是一种单独的、物理的对数据库表中一列或多列的值进行排序的一种存储数据结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="性能调优-Mysql索引数据结构详解与索引优化">
+<meta property="og:url" content="https://niaobulashi.com/2019/08/30/2019-08-30-mysql-indexes/index.html">
+<meta property="og:site_name" content="鸟不拉诗">
+<meta property="og:description" content="最近报名了图灵学院的架构专题的付费课程，没有赶上6月份开课，中途加入的。错过了多线程的直播课程，只能看录播了😭。从性能调优正式开始，视频学习，对自己很有帮助。对自己的学习进行投资是最有用的投资。加油！  本篇文章主要学习了MySQL的索引的数据结构和不同类型索引的认识，做一个大概的了解学习总结。 一、索引在关系数据库中，索引是一种单独的、物理的对数据库表中一列或多列的值进行排序的一种存储数据结">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png">
+<meta property="article:published_time" content="2019-08-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-30T02:55:01.790Z">
+<meta property="article:author" content="鸟不拉诗">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png"><link rel="shortcut icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico"><link rel="canonical" href="https://niaobulashi.com/2019/08/30/2019-08-30-mysql-indexes/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google_site_verification" content="G-5VCD453CKL"/><meta name="baidu_site_verification" content="ffb42684ee1a6179af94ba8bc1920e42"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5VCD453CKL');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '性能调优-Mysql索引数据结构详解与索引优化',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-30 10:55:01'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
 
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
 
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
 
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
-  <meta name="author" content="niaobulashi">
-  <meta name="keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,品味生活，分享技术,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-     <meta name="Keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录,品味生活，分享技术"/> <meta http-equiv="x-ua-compatible" content="IE=edge"> <meta name="mobile-agent" content="format=xhtml;url=https://niaobulashi.com/" /> <meta name="mobile-agent" content="format=html5;url=https://niaobulashi.com/" /> 
-  
-  <title>性能调优-Mysql索引数据结构详解与索引优化 - 鸟不拉诗</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/banner/20210426125918.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="性能调优-Mysql索引数据结构详解与索引优化">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-08-30 00:00" pubdate>
-        2019年8月30日 凌晨
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      6.3k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      68
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">性能调优-Mysql索引数据结构详解与索引优化</h1>
-            
-            <div class="markdown-body">
-              <blockquote>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">鸟不拉诗</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">性能调优-Mysql索引数据结构详解与索引优化</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2019-08-29T16:00:00.000Z" title="发表于 2019-08-30 00:00:00">2019-08-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-30T02:55:01.790Z" title="更新于 2021-04-30 10:55:01">2021-04-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">6.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>19分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="性能调优-Mysql索引数据结构详解与索引优化"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><blockquote>
 <p>最近报名了图灵学院的架构专题的付费课程，没有赶上6月份开课，中途加入的。错过了多线程的直播课程，只能看录播了😭。从性能调优正式开始，视频学习，对自己很有帮助。对自己的学习进行投资是最有用的投资。加油！</p>
 </blockquote>
 <p>本篇文章主要学习了MySQL的索引的数据结构和不同类型索引的认识，做一个大概的了解学习总结。</p>
@@ -262,16 +162,16 @@
 <p>首先说明下MySQL的索引主要是基于Hash表或者B+树。</p>
 <h2 id="二、索引数据结构"><a href="#二、索引数据结构" class="headerlink" title="二、索引数据结构"></a>二、索引数据结构</h2><p>了解索引就需要从索引常见的数据结构开始了解学习，这里有集中常见的的索引数据结构。</p>
 <h3 id="二叉树（Binary-Trees）"><a href="#二叉树（Binary-Trees）" class="headerlink" title="二叉树（Binary Trees）"></a>二叉树（Binary Trees）</h3><p>二叉树是每个节点最多只有两个分支（即不存在分支度大于2的节点）的树结构。通常被称之为“左子树”和“右子树”</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/266359583.jpg"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/266359583.jpg" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="二叉树示例图"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/266359583.jpg"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/266359583.jpg" alt="二叉树示例图"></a></p>
 <p><strong>左子树&lt;父节点&lt;=右子树</strong></p>
 <p>二叉树的第i层至多有有2^(i-1)个节点，</p>
 <p>深度为K的二叉树至多总共有个2^k-1节点（定义根节点所在深度 k0=0），而总计拥有节点数符合的，称为“满二叉树”；</p>
 <p>二叉树通常作为数据结构应用，典型用法是对节点定义一个标记函数，将一些值与每个节点相关系。这样标记的二叉树就可以实现<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%85%83%E6%90%9C%E5%B0%8B%E6%A8%B9">二叉搜索树</a>和<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%85%83%E5%A0%86%E7%A9%8D">二叉堆</a>，并应用于高效率的搜索和排序。</p>
 <p>同时学习数据结构，这里还推荐<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">Data Structure Visualizations</a>进行学习，可以非常直观的看到数据结构允许的过程，一步一步的怎么走的都可以很清晰看得到。</p>
 <p>找到其中的<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/BST.html">Binary Search Trees</a>二叉树</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1566357073576.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png" alt="1566357073576.png"></a></p>
 <p>可以直观的看到二叉树的数据插入过程，如下：</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/694518672.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/694518672.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="二叉树插入过程"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/694518672.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/694518672.gif" alt="二叉树插入过程"></a></p>
 <p>可以看到二叉树不适合用作当作索引的，数据量庞大的话，二叉树的层数会很大，查找效率固然也很慢了。</p>
 <p>推荐阅读：<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8F%89%E6%A0%91">维基百科-二叉树</a></p>
 <h3 id="红黑树（Red-Black-Trees）"><a href="#红黑树（Red-Black-Trees）" class="headerlink" title="红黑树（Red-Black Trees）"></a>红黑树（Red-Black Trees）</h3><p>是一种自平衡二叉查找树，典型用途是实现关联数组。</p>
@@ -285,11 +185,11 @@
 <li>从任一节点到其每个叶子的所有<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E9%81%93%E8%B7%AF_(%E5%9B%BE%E8%AE%BA)">简单路径</a>都包含相同数目的黑色节点。</li>
 </ol>
 <p>下面是一个具体的红黑树的图例：</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/397413570.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/397413570.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="简单红黑树示例图"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/397413570.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/397413570.png" alt="简单红黑树示例图"></a></p>
 <p>这些约束确保了红黑树的关键特性：从根到叶子的最长的可能路径不多于最短的可能路径的两倍长。结果是这个树大致上是平衡的。因为操作比如插入、删除和查找某个值的最坏情况时间都要求与树的高度成比例，这个在高度上的理论上限允许红黑树在最坏情况下都是高效的，而不同于普通的<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91">二叉查找树</a>。</p>
 <p>要知道为什么这些性质确保了这个结果，注意到性质4导致了路径不能有两个毗连的红色节点就足够了。最短的可能路径都是黑色节点，最长的可能路径有交替的红色和黑色节点。因为根据性质5所有最长的路径都有相同数目的黑色节点，这就表明了没有路径能多于任何其他路径的两倍长。</p>
 <p>同样在<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">Data Structure Visualizations</a>中选择<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/RedBlack.html">Red-Black Trees</a>红黑树进行插入操作可以直观的看到红黑树的插入过程</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/588681853.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/588681853.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="红黑树插入过程"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/588681853.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/588681853.gif" alt="红黑树插入过程"></a></p>
 <p>同样红黑树也不适用于MySQL的索引，数据量庞大之后，数层也会变大。</p>
 <p>推荐阅读：</p>
 <p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E7%BA%A2%E9%BB%91%E6%A0%91">维基百科-红黑树</a></p>
@@ -307,14 +207,14 @@
 <h3 id="B树（B-Trees）"><a href="#B树（B-Trees）" class="headerlink" title="B树（B-Trees）"></a>B树（B-Trees）</h3><p>又称：多路平衡查找树。大多数存储引擎都支持B树索引。b树通常意味着所有的值都是按顺序存储的，并且每一个叶子节点到根的距离相同。B树索引能够加快访问数据的速度，因为存储引擎不再需要进行全表扫描来获取数据。下图就是一颗简单的B树。</p>
 <p>在B树中，内部（非叶子）节点可以拥有可变数量的子节点（数量范围预先定义好）。当数据被插入或从一个节点中移除，它的子节点数量发生变化。为了维持在预先设定的数量范围内，内部节点可能会被合并或者分离。</p>
 <p>如下图所示：</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/1766166186.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1766166186.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="B数结构图"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/1766166186.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1766166186.png" alt="B数结构图"></a></p>
 <ul>
 <li>叶节点具有相同的深度，叶节点的指针为空</li>
 <li>所有索引元素不重复</li>
 <li>节点中的数据索引从左到右递增排列</li>
 <li>无论中间节点还是叶子节点都带有卫星数据data（索引元素所指向的数据记录）</li>
 </ul>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/2998451842.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/2998451842.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="B树插入过程"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/2998451842.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/2998451842.gif" alt="B树插入过程"></a></p>
 <p>只演示了插入的过程，其中可以通过delete、find执行删除和查找操作。直观的感受到B树的执行过程。</p>
 <p>每个节点存储了多个Key和子树，子树与Key按顺序排列。</p>
 <blockquote>
@@ -368,9 +268,9 @@
 <li>叶子节点用指针连接，提高区间访问的性能</li>
 <li>只有叶子节点带有卫星数据data（索引元素所指向的数据记录）</li>
 </ul>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/1235167357.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1235167357.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1566368976038.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/1235167357.png"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1235167357.png" alt="1566368976038.png"></a></p>
 <p>同样在<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">Data Structure Visualizations</a>中选择<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html">B+ Trees</a>B+树进行插入操作可以直观的看到插入过程</p>
-<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/18100144.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/18100144.gif" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="B+树插入过程"></a></p>
+<p><a target="_blank" rel="noopener" href="https://images.niaobulashi.com/typecho/uploads/2019/08/18100144.gif"><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/18100144.gif" alt="B+树插入过程"></a></p>
 <p>在动图中可以看出，B+树的每一个叶子节点都有一个指针指向下一个节点，把所有的叶子节点串在一起。索引数据都存储在叶子节点中。</p>
 <p>B+树相比于B树，有什么优势呢：</p>
 <p>1.单一节点存储更多的元素，使得查询的IO次数更少。</p>
@@ -404,34 +304,34 @@
 </li>
 </ol>
 <h2 id="三、MySQL数据库引擎"><a href="#三、MySQL数据库引擎" class="headerlink" title="三、MySQL数据库引擎"></a>三、MySQL数据库引擎</h2><p>通过navicat工具查看表设计选项中，从引擎中可以看到MySQL又这么多引擎。具体细分到每个表，不同的表引擎可以不一样。</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1934170161.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="MySQL数据库引擎"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1934170161.png" alt="MySQL数据库引擎"></p>
 <h3 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h3><p>新建一张表t_test_myisam，引擎使用MyISAM，查看原文件可以看到有3个文件</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1845963369.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="MyISAM索引结构原文件"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1845963369.png" alt="MyISAM索引结构原文件"></p>
 <p>可以看到索引和数据是分开的，其中索引文件仅仅保存数据记录的地址，故属于<strong>非聚簇索引</strong>。</p>
 <h4 id="主键索引（Primary-Index）"><a href="#主键索引（Primary-Index）" class="headerlink" title="主键索引（Primary Index）"></a>主键索引（Primary Index）</h4><p>MyISAM引擎使用B+Tree作为索引结构，叶节点的data存放的是数据记录的地址。如下图是MyISAM主键索引的原理图。</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/2287658511.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="MyISAM主键索引"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/2287658511.png" alt="MyISAM主键索引"></p>
 <p>其中Col1为主键，可以看出看出MyISAM的索引文件仅保存数据记录的地址。</p>
 <h4 id="辅助索引（Secondary-Index）"><a href="#辅助索引（Secondary-Index）" class="headerlink" title="辅助索引（Secondary Index）"></a>辅助索引（Secondary Index）</h4><p>在Col2上建立一个辅助索引，如下图辅助索引原理图。</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1683017602.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="MyISAM辅助索引"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/1683017602.png" alt="MyISAM辅助索引"></p>
 <p>可以看到与主键索引没有任何区别，只不过主键索引的key是唯一的，而辅助索引的key可以重复。</p>
 <p><strong>MyISAM中索引检索的算法为首先按照B+Tree搜索算法搜索索引，如果指定的Key存在，则取出其data域的值，然后以data域的值为地址，读取相应数据记录。</strong></p>
 <p>其中三个字段就是联合索引。</p>
 <p>由于联合索引的出现，key由多个列组成，列的排序决定了可命中索引的列数。也叫<strong>最左前缀匹配</strong></p>
 <p>索引只能用于查找key是否存在（相等），遇到范围查找（&gt;,&lt;,=,between,like左匹配）等就不能进一步匹配。</p>
 <h3 id="InnoDB"><a href="#InnoDB" class="headerlink" title="InnoDB"></a>InnoDB</h3><p>新建一张表t_test_innodb，引擎使用InnoDB，查看原文件可以看到有2个文件</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/2293316698.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="InnoDB索引结构原文件"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/2293316698.png" alt="InnoDB索引结构原文件"></p>
 <h4 id="主键索引（Primary-Index）-1"><a href="#主键索引（Primary-Index）-1" class="headerlink" title="主键索引（Primary Index）"></a>主键索引（Primary Index）</h4><p>InnoDB的索引和数据在一个文件当中。</p>
 <p>按照B+Tree组织的一个索引结构。</p>
 <p>叶节点保存了完整的数据记录和索引。这种索引就叫做<strong>聚簇索引</strong>。</p>
 <p>索引的Key是数据的主键，因此InnoDB表数据文件本身就是主索引。</p>
 <p>如下图：</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/3621007399.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="InnoDB主键索引"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/3621007399.png" alt="InnoDB主键索引"></p>
 <p>可以看到叶节点包含了完整的数据记录。</p>
 <p>因为InnoDB的数据文件本身要按照主键聚集，所以InnoDB要求<strong>必须有主键</strong>。如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段rowid作为主键，这个字段长度为6个字节，类型为长整形。</p>
 <h4 id="辅助索引（Secondary-Index）-1"><a href="#辅助索引（Secondary-Index）-1" class="headerlink" title="辅助索引（Secondary Index）"></a>辅助索引（Secondary Index）</h4><p>辅助索引，将途中的第二行name，作为索引如图</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/3723123900.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="InnoDB辅助索引"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/3723123900.png" alt="InnoDB辅助索引"></p>
 <p><strong>InnoDB 表是基于聚簇索引建立的</strong>。聚簇索引这种实现方式使得按照主键的搜索十分高效，但是<strong>需要首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录</strong>。</p>
-<p><img src="https://cllc.fun/2019/04/01/mysql-index/3.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="123123"></p>
+<p><img src="https://cllc.fun/2019/04/01/mysql-index/3.png" alt="123123"></p>
 <p>由于InnoDB索引的实现特性，推荐使用整形的自增主键。</p>
 <p>有三点好处：</p>
 <ol>
@@ -448,7 +348,7 @@
 <p>如果要查询辅助索引中不含有的字段，得先遍历辅助索引，再遍历聚集索引，而如果要查询的字段值在辅助索引上就有，就不用再查聚集索引了，这显然会减少IO操作。</p>
 <p>例如，联合索引（a,b,c,d）,查询条件a=1 and b=3 and c&gt;3 and d=4;会依次命中a,b,c，无法命中d，这就是最左前缀匹配。</p>
 <p>两个或以上的列上的索引。如下图联合索引的原理图：</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/271003291.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="联合索引原理图"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2019/08/271003291.png" alt="联合索引原理图"></p>
 <p>上图中的联合索引有三个，从上到下，严格按照排序。</p>
 <h2 id="六、优化建议"><a href="#六、优化建议" class="headerlink" title="六、优化建议"></a>六、优化建议</h2><h3 id="最左前缀匹配"><a href="#最左前缀匹配" class="headerlink" title="最左前缀匹配"></a>最左前缀匹配</h3><p>索引可以简单如一个列(a)，也可以复杂如多个列(a, b, c, d)，即<code>联合索引</code>。如果是联合索引，那么key也由多个列组成，同时，索引只能用于查找key是否存在（相等），遇到范围查询(&gt;、&lt;、between、like左匹配)等就不能进一步匹配了，后续退化为线性查找。因此，列的排列顺序决定了可命中索引的列数。</p>
 <p>如有索引(a, b, c, d)，查询条件<code>a = 1 and b = 2 and c &gt; 3 and d = 4</code>，则会在每个节点依次命中a、b、c，无法命中d。也就是最左前缀匹配原则。</p>
@@ -462,344 +362,149 @@
 <h3 id="不需要建立前缀有包含关系的索引"><a href="#不需要建立前缀有包含关系的索引" class="headerlink" title="不需要建立前缀有包含关系的索引"></a>不需要建立前缀有包含关系的索引</h3><p>如果已有索引(a, b)，则不需要再建立索引(a)，但是如果有必要，则仍然需考虑建立索引(b)。</p>
 <h3 id="选择区分度高的列作索引"><a href="#选择区分度高的列作索引" class="headerlink" title="选择区分度高的列作索引"></a>选择区分度高的列作索引</h3><p>很容易理解。如，用性别作索引，那么索引仅能将1000w行数据划分为两部分（如500w男，500w女），索引几乎无效。</p>
 <p><code>区分度</code>的公式是<code>count(distinct &lt;col&gt;) / count(*)</code>，表示字段不重复的比例，比例越大区分度越好。唯一键的区分度是1，而一些状态、性别字段可能在大数据面前的区分度趋近于0。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">鸟不拉诗</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://niaobulashi.com/2019/08/30/2019-08-30-mysql-indexes/">https://niaobulashi.com/2019/08/30/2019-08-30-mysql-indexes/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://niaobulashi.com" target="_blank">鸟不拉诗</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Mysql/">Mysql</a></div><div class="post_share"><div class="social-share" data-image="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2019/09/16/2019-09-16-certification/"><img class="prev-cover" src="https://images.niaobulashi.com/typecho/uploads/2019/09/1807370924.png" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">认识你7年后终于领证了</div></div></a></div><div class="next-post pull-right"><a href="/2019/08/29/2019-08-29-nginx-start/"><img class="next-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2020/nginxanzhaung.jpg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">nginx的安装、配置和卸载</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2018/05/07/2018-05-07-mysql-question/" title="mysql数据库开发常见问题及优化"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/897247-20160625162831875-891132194.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-07</div><div class="title">mysql数据库开发常见问题及优化</div></div></a></div><div><a href="/2020/11/25/2020-11-25-select-mysql-index/" title="Mysql索引类型如何选择？"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/202103/mysqlIndex.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-11-25</div><div class="title">Mysql索引类型如何选择？</div></div></a></div><div><a href="/2020/01/11/2020-01-11-mysql-explain/" title="Mysql的Explain使用及索引总结"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2020/mysql Explain.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-11</div><div class="title">Mysql的Explain使用及索引总结</div></div></a></div><div><a href="/2018/04/22/2018-04-22-linux-mysql-apache-php/" title="Linux搭建mysql、apache、php服务总结"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-04-22</div><div class="title">Linux搭建mysql、apache、php服务总结</div></div></a></div><div><a href="/2018/05/04/2018-05-04-linux-shell/" title="Linux中常用Shell命令"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-04</div><div class="title">Linux中常用Shell命令</div></div></a></div><div><a href="/2018/05/22/2018-05-22-planToSSL/" title="Lets Encrypt证书终于搞定了"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/22222.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-22</div><div class="title">Lets Encrypt证书终于搞定了</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/><div class="author-info__name">鸟不拉诗</div><div class="author-info__description">品味生活，分享技术</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/niaobulashi" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hulang6666@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%B4%A2%E5%BC%95"><span class="toc-number">1.</span> <span class="toc-text">一、索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">二、索引数据结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91%EF%BC%88Binary-Trees%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">二叉树（Binary Trees）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91%EF%BC%88Red-Black-Trees%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">红黑树（Red-Black Trees）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E7%BB%93%E6%9E%84%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">2.3.</span> <span class="toc-text">其他结构的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#B%E6%A0%91%EF%BC%88B-Trees%EF%BC%89"><span class="toc-number">2.4.</span> <span class="toc-text">B树（B-Trees）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#B-%E6%A0%91%EF%BC%88B-Trees%EF%BC%89"><span class="toc-number">2.5.</span> <span class="toc-text">B+树（B+Trees）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hash%E7%B4%A2%E5%BC%95"><span class="toc-number">2.6.</span> <span class="toc-text">Hash索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81MySQL%E6%95%B0%E6%8D%AE%E5%BA%93%E5%BC%95%E6%93%8E"><span class="toc-number">3.</span> <span class="toc-text">三、MySQL数据库引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#MyISAM"><span class="toc-number">3.1.</span> <span class="toc-text">MyISAM</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%EF%BC%88Primary-Index%EF%BC%89"><span class="toc-number">3.1.1.</span> <span class="toc-text">主键索引（Primary Index）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BE%85%E5%8A%A9%E7%B4%A2%E5%BC%95%EF%BC%88Secondary-Index%EF%BC%89"><span class="toc-number">3.1.2.</span> <span class="toc-text">辅助索引（Secondary Index）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#InnoDB"><span class="toc-number">3.2.</span> <span class="toc-text">InnoDB</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%EF%BC%88Primary-Index%EF%BC%89-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">主键索引（Primary Index）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BE%85%E5%8A%A9%E7%B4%A2%E5%BC%95%EF%BC%88Secondary-Index%EF%BC%89-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">辅助索引（Secondary Index）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#InnoDB%E7%B4%A2%E5%BC%95%E5%92%8CMyISAM%E7%B4%A2%E5%BC%95%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">3.3.</span> <span class="toc-text">InnoDB索引和MyISAM索引的区别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95%EF%BC%88Covering-index%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">四、覆盖索引（Covering index）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95"><span class="toc-number">5.</span> <span class="toc-text">五、联合索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E4%BC%98%E5%8C%96%E5%BB%BA%E8%AE%AE"><span class="toc-number">6.</span> <span class="toc-text">六、优化建议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%B7%A6%E5%89%8D%E7%BC%80%E5%8C%B9%E9%85%8D"><span class="toc-number">6.1.</span> <span class="toc-text">最左前缀匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E3%80%81in%E8%87%AA%E5%8A%A8%E4%BC%98%E5%8C%96%E9%A1%BA%E5%BA%8F"><span class="toc-number">6.2.</span> <span class="toc-text">&#x3D;、in自动优化顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E5%88%97%E4%B8%8D%E8%83%BD%E5%8F%82%E4%B8%8E%E8%AE%A1%E7%AE%97"><span class="toc-number">6.3.</span> <span class="toc-text">索引列不能参与计算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%BD%E6%89%A9%E5%B1%95%E5%B0%B1%E4%B8%8D%E8%A6%81%E6%96%B0%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="toc-number">6.4.</span> <span class="toc-text">能扩展就不要新建索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8D%E9%9C%80%E8%A6%81%E5%BB%BA%E7%AB%8B%E5%89%8D%E7%BC%80%E6%9C%89%E5%8C%85%E5%90%AB%E5%85%B3%E7%B3%BB%E7%9A%84%E7%B4%A2%E5%BC%95"><span class="toc-number">6.5.</span> <span class="toc-text">不需要建立前缀有包含关系的索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%89%E6%8B%A9%E5%8C%BA%E5%88%86%E5%BA%A6%E9%AB%98%E7%9A%84%E5%88%97%E4%BD%9C%E7%B4%A2%E5%BC%95"><span class="toc-number">6.6.</span> <span class="toc-text">选择区分度高的列作索引</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询"><img src="https://images.niaobulashi.com/hexo/niaobulashi/2019/wuyi.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="假期余额查询"/></a><div class="content"><a class="title" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询">假期余额查询</a><time datetime="2021-04-30T03:12:10.000Z" title="发表于 2021-04-30 11:12:10">2021-04-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="下班去大雁塔溜达"/></a><div class="content"><a class="title" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达">下班去大雁塔溜达</a><time datetime="2021-04-29T02:24:30.000Z" title="发表于 2021-04-29 10:24:30">2021-04-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="秒杀业务方案思路"/></a><div class="content"><a class="title" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路">秒杀业务方案思路</a><time datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="逛一逛大唐芙蓉园"/></a><div class="content"><a class="title" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园">逛一逛大唐芙蓉园</a><time datetime="2021-04-26T04:40:30.000Z" title="发表于 2021-04-26 12:40:30">2021-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/45461931fa6a4133920f84f7271d262e.jpeg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="我国适龄儿童可免费接种15种疫苗"/></a><div class="content"><a class="title" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗">我国适龄儿童可免费接种15种疫苗</a><time datetime="2021-04-25T03:33:30.000Z" title="发表于 2021-04-25 11:33:30">2021-04-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By 鸟不拉诗</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
-                    
-                      <a class="hover-with-bg" href="/tags/Mysql/">Mysql</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/09/16/2019-09-16-certification/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">认识你7年后终于领证了</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2019/08/29/2019-08-29-nginx-start/">
-                        <span class="hidden-mobile">nginx的安装、配置和卸载</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.lazyComments('valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
-        new Valine({
-          el: "#valine",
-          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
-          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
-          placeholder: "说点什么~",
-          path: window.location.pathname,
-          avatar: "retro",
-          meta: ["nick","mail","link"],
-          pageSize: "10",
-          lang: "zh-CN",
-          highlight: false,
-          recordIP: false,
-          serverURLs: "",
-        });
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the
-    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
-  </noscript>
+document.addEventListener('DOMContentLoaded', panguInit)</script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
 
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz',
+      appKey: 'WsdLwIB6AC0kk3T7hHhFJPO2',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
 
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
 
-      </div>
-    
-  </div>
-</div>
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
 
-<!-- Custom -->
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
 
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
 
-    
+document.addEventListener('pjax:send', function () {
 
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
+  // removeEventListener toc scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-      <div class="col-lg-7 mx-auto nopadding-x-md">
-        <div class="container custom mx-auto">
-           <script src="/js/sidecar.v1.js" async defer></script> <script> ((window.gitter = {}).chat = {}).options = { room: "niaobulashi/Lobby" }; </script> 
-        </div>
-      </div>
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://niaobulashi.com/atom" target="_blank" rel="nofollow noopener"><span>SSR</span></a> <i class="iconfont icon-love"></i> <a href="https://www.upyun.com/" rel="external nofollow" target="_blank"><img style="vertical-align:middle" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/yun_logo6.png" class="lazyload"></a> 
-  </div>
+  typeof preloader === 'object' && preloader.initLoading()
   
-  <div class="statistics">
-    
-    
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
 
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
+  typeof typed === 'object' && typed.destroy()
 
-    
-  </div>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
 
+})
 
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        鄂ICP备17026246号-1
-      </a>
-    </span>
-    
-  </div>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
-  
-</footer>
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
 
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'G-5VCD453CKL', {'page_path': window.location.pathname});
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
 
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
 
-<!-- Plugins -->
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
 
+  typeof preloader === 'object' && preloader.endLoading()
+})
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-5VCD453CKL', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5VCD453CKL');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

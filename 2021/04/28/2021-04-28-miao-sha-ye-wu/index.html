@@ -1,259 +1,158 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>秒杀业务方案思路 | 鸟不拉诗</title><meta name="keywords" content="秒杀业务"><meta name="author" content="鸟不拉诗"><meta name="copyright" content="鸟不拉诗"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="秒杀业务最大的业务特点，短时间内，高并发，大量读请求，大量的写请求。如果不经任何优化，直接将全部读写请求打到数据库层，数据库层由于锁冲突，特别是热点数据行锁冲突，很容易造成死锁，降低数据库执行效率。而且流量很大的情况，很容易将会把数据库压死。数据库层若挂了，如果再次启动，很可能又会被大流量再次压垮。 从系统的角度来看，在秒杀业务的情况下，我们要保护数据层的安全。  为了保证数据库的安全，我们就要降">
+<meta property="og:type" content="article">
+<meta property="og:title" content="秒杀业务方案思路">
+<meta property="og:url" content="https://niaobulashi.com/2021/04/28/2021-04-28-miao-sha-ye-wu/index.html">
+<meta property="og:site_name" content="鸟不拉诗">
+<meta property="og:description" content="秒杀业务最大的业务特点，短时间内，高并发，大量读请求，大量的写请求。如果不经任何优化，直接将全部读写请求打到数据库层，数据库层由于锁冲突，特别是热点数据行锁冲突，很容易造成死锁，降低数据库执行效率。而且流量很大的情况，很容易将会把数据库压死。数据库层若挂了，如果再次启动，很可能又会被大流量再次压垮。 从系统的角度来看，在秒杀业务的情况下，我们要保护数据层的安全。  为了保证数据库的安全，我们就要降">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg">
+<meta property="article:published_time" content="2021-04-28T06:24:30.000Z">
+<meta property="article:modified_time" content="2021-04-30T01:31:17.583Z">
+<meta property="article:author" content="鸟不拉诗">
+<meta property="article:tag" content="秒杀业务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg"><link rel="shortcut icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico"><link rel="canonical" href="https://niaobulashi.com/2021/04/28/2021-04-28-miao-sha-ye-wu/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google_site_verification" content="G-5VCD453CKL"/><meta name="baidu_site_verification" content="ffb42684ee1a6179af94ba8bc1920e42"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5VCD453CKL');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '秒杀业务方案思路',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-30 09:31:17'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
 
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
 
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
 
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
-  <meta name="author" content="niaobulashi">
-  <meta name="keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,品味生活，分享技术,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-     <meta name="Keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录,品味生活，分享技术"/> <meta http-equiv="x-ua-compatible" content="IE=edge"> <meta name="mobile-agent" content="format=xhtml;url=https://niaobulashi.com/" /> <meta name="mobile-agent" content="format=html5;url=https://niaobulashi.com/" /> 
-  
-  <title>秒杀业务方案思路 - 鸟不拉诗</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/banner/20210426125918.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="秒杀业务方案思路">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-04-28 14:24" pubdate>
-        2021年4月28日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1.8k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      18
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">秒杀业务方案思路</h1>
-            
-            <div class="markdown-body">
-              <p>秒杀业务最大的业务特点，短时间内，高并发，大量读请求，大量的写请求。如果不经任何优化，直接将全部读写请求打到数据库层，数据库层由于锁冲突，特别是热点数据行锁冲突，很容易造成死锁，降低数据库执行效率。而且流量很大的情况，很容易将会把数据库压死。数据库层若挂了，如果再次启动，很可能又会被大流量再次压垮。</p>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">鸟不拉诗</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">秒杀业务方案思路</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-30T01:31:17.583Z" title="更新于 2021-04-30 09:31:17">2021-04-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="秒杀业务方案思路"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>秒杀业务最大的业务特点，短时间内，高并发，大量读请求，大量的写请求。如果不经任何优化，直接将全部读写请求打到数据库层，数据库层由于锁冲突，特别是热点数据行锁冲突，很容易造成死锁，降低数据库执行效率。而且流量很大的情况，很容易将会把数据库压死。数据库层若挂了，如果再次启动，很可能又会被大流量再次压垮。</p>
 <p>从系统的角度来看，在秒杀业务的情况下，我们要保护数据层的安全。 </p>
 <p>为了保证数据库的安全，我们就要降低最后到达数据库层读写流量，使其一直处于安全的情况下运行。 </p>
 <p>从读写方向，优化思路： </p>
@@ -263,7 +162,7 @@
 </ul>
 <p>降低数据层读请求，主要办法就是加缓存，数据优先读取缓存，缓存不存在再从数据库层读取。缓存解决办法比较多，下面主要介绍降写的处理办法。 </p>
 <p>降低数据层写请求，我们就必须在上游应用层过滤写清求。 </p>
-<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210428142339.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload></p>
+<p><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210428142339.png"></p>
 <h2 id="技术优化手段"><a href="#技术优化手段" class="headerlink" title="技术优化手段"></a>技术优化手段</h2><p>假设我们的系统架构如下： </p>
 <p>网站/APP—-&gt;站点接入应用——&gt;后台服务—-&gt;数据库层 </p>
 <p>我们可以在这三层做优化，拦截写请求，降低数据层写压力。 </p>
@@ -289,344 +188,151 @@
 <h2 id="热点隔离"><a href="#热点隔离" class="headerlink" title="热点隔离"></a>热点隔离</h2><p>秒杀系统设计的第一个原则就是将这种热点数据隔离出来，不要让1%的请求影响到另外的99%，隔离出来后也更方便对这1%的请求做针对性优化。针对秒杀我们做了多个层次的隔离：</p>
 <h3 id="业务隔离"><a href="#业务隔离" class="headerlink" title="业务隔离"></a>业务隔离</h3><p>把秒杀做成一种营销活动，卖家要参加秒杀这种营销活动需要单独报名，从技术上来说，卖家报名后对我们来说就是已知热点，当真正开始时我们可以提前做好预热。其实这种方法比较恶心，也是现在某宝，某东经常做的，而且还有那种游戏里面做的也是这种形式。</p>
 <h3 id="系统隔离"><a href="#系统隔离" class="headerlink" title="系统隔离"></a>系统隔离</h3><p>系统隔离更多是运行时的隔离，可以通过分组部署的方式和另外99%分开。秒杀还申请了单独的域名，目的也是让请求落到不同的集群中。 数据隔离。秒杀所调用的数据大部分都是热数据，比如会启用单独cache集群或MySQL数据库来放热点数据，目前也是不想0.01%的数据影响另外99.99%。</p>
-<h2 id="动静分离"><a href="#动静分离" class="headerlink" title="动静分离"></a>动静分离</h2><p>大家看一下图一<br><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429092153.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload><br>这是把整个页面Cache在用户浏览器，这样把90%的静态数据缓存在用户端或者CDN上，当真正秒杀时用户只需要点击特殊的按钮“刷新抢宝”即可，而不需要刷新整个页面，这样只向服务端请求很少的有效数据，而不需要重复请求大量静态数据。秒杀的动态数据和普通的详情页面的动态数据相比更少，性能也比普通的详情提升3倍以上。所以“刷新抢宝”这种设计思路很好地解决了不刷新页面就能请求到服务端最新的动态数据。 </p>
+<h2 id="动静分离"><a href="#动静分离" class="headerlink" title="动静分离"></a>动静分离</h2><p>大家看一下图一<br><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429092153.png"><br>这是把整个页面Cache在用户浏览器，这样把90%的静态数据缓存在用户端或者CDN上，当真正秒杀时用户只需要点击特殊的按钮“刷新抢宝”即可，而不需要刷新整个页面，这样只向服务端请求很少的有效数据，而不需要重复请求大量静态数据。秒杀的动态数据和普通的详情页面的动态数据相比更少，性能也比普通的详情提升3倍以上。所以“刷新抢宝”这种设计思路很好地解决了不刷新页面就能请求到服务端最新的动态数据。 </p>
 <p>其实这种我发现也是用于解决高并发的一种手段，像如果要是很多培训出来的同学的话，有做电商项目的可能会用到的，希望能给大家有一些好的启发，如果能唬住面试官的话，那肯定能获取一份不错的offer</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">鸟不拉诗</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://niaobulashi.com/2021/04/28/2021-04-28-miao-sha-ye-wu/">https://niaobulashi.com/2021/04/28/2021-04-28-miao-sha-ye-wu/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://niaobulashi.com" target="_blank">鸟不拉诗</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%A7%92%E6%9D%80%E4%B8%9A%E5%8A%A1/">秒杀业务</a></div><div class="post_share"><div class="social-share" data-image="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/"><img class="prev-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">下班去大雁塔溜达</div></div></a></div><div class="next-post pull-right"><a href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">逛一逛大唐芙蓉园</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/><div class="author-info__name">鸟不拉诗</div><div class="author-info__description">品味生活，分享技术</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/niaobulashi" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hulang6666@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E4%BC%98%E5%8C%96%E6%89%8B%E6%AE%B5"><span class="toc-number">1.</span> <span class="toc-text">技术优化手段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%A7%E5%93%81%E6%89%8B%E6%AE%B5"><span class="toc-number">2.</span> <span class="toc-text">产品手段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="toc-number">2.1.</span> <span class="toc-text">相关问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AB%99%E7%82%B9%E5%B1%82%E6%9C%8D%E5%8A%A1%E5%8E%8B%E5%8A%9B%E5%BE%88%E5%A4%A7%E7%9A%84%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88"><span class="toc-number">2.1.1.</span> <span class="toc-text">站点层服务压力很大的处理方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%A1%E6%95%B0%E9%97%AE%E9%A2%98"><span class="toc-number">2.1.2.</span> <span class="toc-text">计数问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%98%9F%E5%88%97%E5%BC%82%E6%AD%A5%E5%A4%84%E7%90%86%EF%BC%8C%E6%B5%8F%E8%A7%88%E5%99%A8-APP%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F"><span class="toc-number">2.1.3.</span> <span class="toc-text">队列异步处理，浏览器&#x2F;APP处理方式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%83%AD%E7%82%B9%E9%9A%94%E7%A6%BB"><span class="toc-number">3.</span> <span class="toc-text">热点隔离</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%9A%E5%8A%A1%E9%9A%94%E7%A6%BB"><span class="toc-number">3.1.</span> <span class="toc-text">业务隔离</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E9%9A%94%E7%A6%BB"><span class="toc-number">3.2.</span> <span class="toc-text">系统隔离</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB"><span class="toc-number">4.</span> <span class="toc-text">动静分离</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询"><img src="https://images.niaobulashi.com/hexo/niaobulashi/2019/wuyi.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="假期余额查询"/></a><div class="content"><a class="title" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询">假期余额查询</a><time datetime="2021-04-30T03:12:10.000Z" title="发表于 2021-04-30 11:12:10">2021-04-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="下班去大雁塔溜达"/></a><div class="content"><a class="title" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达">下班去大雁塔溜达</a><time datetime="2021-04-29T02:24:30.000Z" title="发表于 2021-04-29 10:24:30">2021-04-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="秒杀业务方案思路"/></a><div class="content"><a class="title" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路">秒杀业务方案思路</a><time datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="逛一逛大唐芙蓉园"/></a><div class="content"><a class="title" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园">逛一逛大唐芙蓉园</a><time datetime="2021-04-26T04:40:30.000Z" title="发表于 2021-04-26 12:40:30">2021-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/45461931fa6a4133920f84f7271d262e.jpeg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="我国适龄儿童可免费接种15种疫苗"/></a><div class="content"><a class="title" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗">我国适龄儿童可免费接种15种疫苗</a><time datetime="2021-04-25T03:33:30.000Z" title="发表于 2021-04-25 11:33:30">2021-04-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By 鸟不拉诗</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/%E7%A7%92%E6%9D%80%E4%B8%9A%E5%8A%A1/">秒杀业务</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">下班去大雁塔溜达</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/">
-                        <span class="hidden-mobile">逛一逛大唐芙蓉园</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.lazyComments('valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
-        new Valine({
-          el: "#valine",
-          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
-          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
-          placeholder: "说点什么~",
-          path: window.location.pathname,
-          avatar: "retro",
-          meta: ["nick","mail","link"],
-          pageSize: "10",
-          lang: "zh-CN",
-          highlight: false,
-          recordIP: false,
-          serverURLs: "",
-        });
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the
-    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
-  </noscript>
+document.addEventListener('DOMContentLoaded', panguInit)</script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
 
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz',
+      appKey: 'WsdLwIB6AC0kk3T7hHhFJPO2',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
 
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
 
-      </div>
-    
-  </div>
-</div>
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
 
-<!-- Custom -->
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
 
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
 
-    
+document.addEventListener('pjax:send', function () {
 
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
+  // removeEventListener toc scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-      <div class="col-lg-7 mx-auto nopadding-x-md">
-        <div class="container custom mx-auto">
-           <script src="/js/sidecar.v1.js" async defer></script> <script> ((window.gitter = {}).chat = {}).options = { room: "niaobulashi/Lobby" }; </script> 
-        </div>
-      </div>
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://niaobulashi.com/atom" target="_blank" rel="nofollow noopener"><span>SSR</span></a> <i class="iconfont icon-love"></i> <a href="https://www.upyun.com/" rel="external nofollow" target="_blank"><img style="vertical-align:middle" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/yun_logo6.png" class="lazyload"></a> 
-  </div>
+  typeof preloader === 'object' && preloader.initLoading()
   
-  <div class="statistics">
-    
-    
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
 
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
+  typeof typed === 'object' && typed.destroy()
 
-    
-  </div>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
 
+})
 
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        鄂ICP备17026246号-1
-      </a>
-    </span>
-    
-  </div>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
-  
-</footer>
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
 
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'G-5VCD453CKL', {'page_path': window.location.pathname});
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
 
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
 
-<!-- Plugins -->
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
 
+  typeof preloader === 'object' && preloader.endLoading()
+})
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-5VCD453CKL', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5VCD453CKL');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

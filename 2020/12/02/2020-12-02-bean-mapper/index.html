@@ -1,697 +1,403 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>5种常见Bean映射工具的性能比对 | 鸟不拉诗</title><meta name="keywords" content="Java"><meta name="author" content="鸟不拉诗"><meta name="copyright" content="鸟不拉诗"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1. 介绍创建由多个层组成的大型 Java 应用程序需要使用多种领域模型，如持久化模型、领域模型或者所谓的 DTO。为不同的应用程序层使用多个模型将要求我们提供 bean 之间的映射方法。手动执行此操作可以快速创建大量样板代码并消耗大量时间。幸运的是，Java 有多个对象映射框架。在本教程中，我们将比较最流行的 Java 映射框架的性能。  综合日常使用情况和相关测试数据，个人感觉 MapStru">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5种常见Bean映射工具的性能比对">
+<meta property="og:url" content="https://niaobulashi.com/2020/12/02/2020-12-02-bean-mapper/index.html">
+<meta property="og:site_name" content="鸟不拉诗">
+<meta property="og:description" content="1. 介绍创建由多个层组成的大型 Java 应用程序需要使用多种领域模型，如持久化模型、领域模型或者所谓的 DTO。为不同的应用程序层使用多个模型将要求我们提供 bean 之间的映射方法。手动执行此操作可以快速创建大量样板代码并消耗大量时间。幸运的是，Java 有多个对象映射框架。在本教程中，我们将比较最流行的 Java 映射框架的性能。  综合日常使用情况和相关测试数据，个人感觉 MapStru">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.niaobulashi.com/hexo/niaobulashi/202103/javaBean.png">
+<meta property="article:published_time" content="2020-12-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-30T02:55:02.966Z">
+<meta property="article:author" content="鸟不拉诗">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.niaobulashi.com/hexo/niaobulashi/202103/javaBean.png"><link rel="shortcut icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico"><link rel="canonical" href="https://niaobulashi.com/2020/12/02/2020-12-02-bean-mapper/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google_site_verification" content="G-5VCD453CKL"/><meta name="baidu_site_verification" content="ffb42684ee1a6179af94ba8bc1920e42"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5VCD453CKL');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '5种常见Bean映射工具的性能比对',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-30 10:55:02'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
 
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
 
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
 
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
-  <meta name="author" content="niaobulashi">
-  <meta name="keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,品味生活，分享技术,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-     <meta name="Keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录,品味生活，分享技术"/> <meta http-equiv="x-ua-compatible" content="IE=edge"> <meta name="mobile-agent" content="format=xhtml;url=https://niaobulashi.com/" /> <meta name="mobile-agent" content="format=html5;url=https://niaobulashi.com/" /> 
-  
-  <title>5种常见Bean映射工具的性能比对 - 鸟不拉诗</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/banner/20210426125918.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="5种常见Bean映射工具的性能比对">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-02 00:00" pubdate>
-        2020年12月2日 凌晨
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      2.7k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      36
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">5种常见Bean映射工具的性能比对</h1>
-            
-            <div class="markdown-body">
-              <h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p>创建由多个层组成的大型 Java 应用程序需要使用多种领域模型，如持久化模型、领域模型或者所谓的 DTO。为不同的应用程序层使用多个模型将要求我们提供 bean 之间的映射方法。手动执行此操作可以快速创建大量样板代码并消耗大量时间。幸运的是，Java 有多个对象映射框架。在本教程中，我们将比较最流行的 Java 映射框架的性能。</p>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">鸟不拉诗</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">5种常见Bean映射工具的性能比对</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-12-01T16:00:00.000Z" title="发表于 2020-12-02 00:00:00">2020-12-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-30T02:55:02.966Z" title="更新于 2021-04-30 10:55:02">2021-04-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>10分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="5种常见Bean映射工具的性能比对"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p>创建由多个层组成的大型 Java 应用程序需要使用多种领域模型，如持久化模型、领域模型或者所谓的 DTO。为不同的应用程序层使用多个模型将要求我们提供 bean 之间的映射方法。手动执行此操作可以快速创建大量样板代码并消耗大量时间。幸运的是，Java 有多个对象映射框架。在本教程中，我们将比较最流行的 Java 映射框架的性能。</p>
 <blockquote>
 <p>综合日常使用情况和相关测试数据，个人感觉 MapStruct、ModelMapper 这两个 Bean 映射框架是最佳选择。</p>
 </blockquote>
 <h2 id="2-常见-Bean-映射框架概览"><a href="#2-常见-Bean-映射框架概览" class="headerlink" title="2. 常见 Bean 映射框架概览"></a>2. 常见 Bean 映射框架概览</h2><h3 id="2-1-Dozer"><a href="#2-1-Dozer" class="headerlink" title="2.1. Dozer"></a>2.1. Dozer</h3><p>Dozer 是一个映射框架，它使用递归将数据从一个对象复制到另一个对象。框架不仅能够在 bean 之间复制属性，还能够在不同类型之间自动转换。</p>
 <p>要使用 Dozer 框架，我们需要添加这样的依赖到我们的项目:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>net.sf.dozer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>dozer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.5.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>net.sf.dozer<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>dozer<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>5.5.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>更多关于 Dozer 的内容可以在官方文档中找到： <a target="_blank" rel="noopener" href="http://dozer.sourceforge.net/documentation/gettingstarted.html">http://dozer.sourceforge.net/documentation/gettingstarted.html</a> ，或者你也可以阅读这篇文章：<a target="_blank" rel="noopener" href="https://www.baeldung.com/dozer">https://www.baeldung.com/dozer</a> 。</p>
 <h3 id="2-2-Orika"><a href="#2-2-Orika" class="headerlink" title="2.2. Orika"></a>2.2. Orika</h3><p>Orika 是一个 bean 到 bean 的映射框架，它递归地将数据从一个对象复制到另一个对象。</p>
 <p>Orika 的工作原理与 Dozer 相似。两者之间的主要区别是 Orika 使用字节码生成。这允许以最小的开销生成更快的映射器。</p>
 <p>要使用 Orika 框架，我们需要添加这样的依赖到我们的项目:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>ma.glasnost.orika<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>orika-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.5.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>ma.glasnost.orika<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>orika-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.5.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>更多关于 Orika 的内容可以在官方文档中找到：<a target="_blank" rel="noopener" href="https://orika-mapper.github.io/orika-docs/%EF%BC%8C%E6%88%96%E8%80%85%E4%BD%A0%E4%B9%9F%E5%8F%AF%E4%BB%A5%E9%98%85%E8%AF%BB%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0%EF%BC%9Ahttps://www.baeldung.com/orika-mapping%E3%80%82">https://orika-mapper.github.io/orika-docs/，或者你也可以阅读这篇文章：https://www.baeldung.com/orika-mapping。</a></p>
 <h3 id="2-3-MapStruct"><a href="#2-3-MapStruct" class="headerlink" title="2.3. MapStruct"></a>2.3. MapStruct</h3><p>MapStruct 是一个自动生成 bean mapper 类的代码生成器。MapStruct 还能够在不同的数据类型之间进行转换。Github 地址：<a target="_blank" rel="noopener" href="https://github.com/mapstruct/mapstruct%E3%80%82">https://github.com/mapstruct/mapstruct。</a></p>
 <p>要使用 MapStruct 框架，我们需要添加这样的依赖到我们的项目:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mapstruct<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mapstruct-processor<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.0.Final<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mapstruct<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mapstruct-processor<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.0.Final<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>更多关于 MapStruct 的内容可以在官方文档中找到：<a target="_blank" rel="noopener" href="https://mapstruct.org/%EF%BC%8C%E6%88%96%E8%80%85%E4%BD%A0%E4%B9%9F%E5%8F%AF%E4%BB%A5%E9%98%85%E8%AF%BB%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0%EF%BC%9Ahttps://www.baeldung.com/mapstruct%E3%80%82">https://mapstruct.org/，或者你也可以阅读这篇文章：https://www.baeldung.com/mapstruct。</a></p>
 <p>要使用 MapStruct 框架，我们需要添加这样的依赖到我们的项目:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mapstruct<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mapstruct-processor<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.0.Final<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mapstruct<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mapstruct-processor<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.0.Final<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <h3 id="2-4-ModelMapper"><a href="#2-4-ModelMapper" class="headerlink" title="2.4. ModelMapper"></a>2.4. ModelMapper</h3><p>ModelMapper 是一个旨在简化对象映射的框架，它根据约定确定对象之间的映射方式。它提供了类型安全的和重构安全的 API。</p>
 <p>更多关于 ModelMapper 的内容可以在官方文档中找到：<a target="_blank" rel="noopener" href="http://modelmapper.org/">http://modelmapper.org/</a> 。</p>
 <p>要使用 ModelMapper 框架，我们需要添加这样的依赖到我们的项目:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.modelmapper<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>modelmapper<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.1.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.modelmapper<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>modelmapper<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.1.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <h3 id="2-5-JMapper"><a href="#2-5-JMapper" class="headerlink" title="2.5. JMapper"></a>2.5. JMapper</h3><p>JMapper 是一个映射框架，旨在提供易于使用的、高性能的 Java bean 之间的映射。该框架旨在使用注释和关系映射应用 DRY 原则。该框架允许不同的配置方式:基于注释、XML 或基于 api。</p>
 <p>更多关于 JMapper 的内容可以在官方文档中找到：<a target="_blank" rel="noopener" href="https://github.com/jmapper-framework/jmapper-core/wiki%E3%80%82">https://github.com/jmapper-framework/jmapper-core/wiki。</a></p>
 <p>要使用 JMapper 框架，我们需要添加这样的依赖到我们的项目:</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-section">&lt;dependency&gt;</span><br>    <span class="hljs-section">&lt;groupId&gt;</span><span class="hljs-attribute">com</span>.googlecode.jmapper-framework&lt;/groupId&gt;<br>    <span class="hljs-section">&lt;artifactId&gt;</span><span class="hljs-attribute">jmapper</span>-core&lt;/artifactId&gt;<br>    <span class="hljs-section">&lt;version&gt;</span><span class="hljs-attribute">1</span>.<span class="hljs-number">6</span>.<span class="hljs-number">0</span>.<span class="hljs-number">1</span>&lt;/version&gt;<br><span class="hljs-section">&lt;/dependency&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="code"><pre><code class="hljs apache"><span class="hljs-section">&lt;dependency&gt;</span><br>    <span class="hljs-section">&lt;groupId&gt;</span><span class="hljs-attribute">com</span>.googlecode.jmapper-framework&lt;/groupId&gt;<br>    <span class="hljs-section">&lt;artifactId&gt;</span><span class="hljs-attribute">jmapper</span>-core&lt;/artifactId&gt;<br>    <span class="hljs-section">&lt;version&gt;</span><span class="hljs-attribute">1</span>.<span class="hljs-number">6</span>.<span class="hljs-number">0</span>.<span class="hljs-number">1</span>&lt;/version&gt;<br><span class="hljs-section">&lt;/dependency&gt;</span><br></code></pre></td></tr></table></figure>
 
 <h2 id="3-测试模型"><a href="#3-测试模型" class="headerlink" title="3.测试模型"></a>3.测试模型</h2><p>为了能够正确地测试映射，我们需要有一个源和目标模型。我们已经创建了两个测试模型。</p>
 <p>第一个是一个只有一个字符串字段的简单 POJO，它允许我们在更简单的情况下比较框架，并检查如果我们使用更复杂的 bean 是否会发生任何变化。</p>
 <p>简单的源模型如下:</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs haxe"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SourceCode</span> </span>&#123;<br>    <span class="hljs-keyword">String</span> code;<br>    <span class="hljs-comment">// getter and setter</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight haxe"><table><tr><td class="code"><pre><code class="hljs haxe"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SourceCode</span> </span>&#123;<br>    <span class="hljs-keyword">String</span> code;<br>    <span class="hljs-comment">// getter and setter</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>它的目标也很相似:</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs haxe"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DestinationCode</span> </span>&#123;<br>    <span class="hljs-keyword">String</span> code;<br>    <span class="hljs-comment">// getter and setter</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight haxe"><table><tr><td class="code"><pre><code class="hljs haxe"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DestinationCode</span> </span>&#123;<br>    <span class="hljs-keyword">String</span> code;<br>    <span class="hljs-comment">// getter and setter</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>源 bean 的实际示例如下:</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">SourceOrder</span> &#123;<br>    <span class="hljs-keyword">private</span> String orderFinishDate;<br>    <span class="hljs-keyword">private</span> PaymentType paymentType;<br>    <span class="hljs-keyword">private</span> Discount discount;<br>    <span class="hljs-keyword">private</span> DeliveryData deliveryData;<br>    <span class="hljs-keyword">private</span> User orderingUser;<br>    <span class="hljs-keyword">private</span> List&lt;Product&gt; orderedProducts;<br>    <span class="hljs-keyword">private</span> Shop offeringShop;<br>    <span class="hljs-keyword">private</span> <span class="hljs-built_in">int</span> orderId;<br>    <span class="hljs-keyword">private</span> OrderStatus status;<br>    <span class="hljs-keyword">private</span> LocalDate orderDate;<br>    <span class="hljs-comment">// standard getters and setters</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">SourceOrder</span> &#123;<br>    <span class="hljs-keyword">private</span> String orderFinishDate;<br>    <span class="hljs-keyword">private</span> PaymentType paymentType;<br>    <span class="hljs-keyword">private</span> Discount discount;<br>    <span class="hljs-keyword">private</span> DeliveryData deliveryData;<br>    <span class="hljs-keyword">private</span> User orderingUser;<br>    <span class="hljs-keyword">private</span> List&lt;Product&gt; orderedProducts;<br>    <span class="hljs-keyword">private</span> Shop offeringShop;<br>    <span class="hljs-keyword">private</span> <span class="hljs-built_in">int</span> orderId;<br>    <span class="hljs-keyword">private</span> OrderStatus status;<br>    <span class="hljs-keyword">private</span> LocalDate orderDate;<br>    <span class="hljs-comment">// standard getters and setters</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>目标类如下图所示:</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">Order</span> &#123;<br>    <span class="hljs-keyword">private</span> User orderingUser;<br>    <span class="hljs-keyword">private</span> List&lt;Product&gt; orderedProducts;<br>    <span class="hljs-keyword">private</span> OrderStatus orderStatus;<br>    <span class="hljs-keyword">private</span> LocalDate orderDate;<br>    <span class="hljs-keyword">private</span> LocalDate orderFinishDate;<br>    <span class="hljs-keyword">private</span> PaymentType paymentType;<br>    <span class="hljs-keyword">private</span> Discount discount;<br>    <span class="hljs-keyword">private</span> <span class="hljs-built_in">int</span> shopId;<br>    <span class="hljs-keyword">private</span> DeliveryData deliveryData;<br>    <span class="hljs-keyword">private</span> Shop offeringShop;<br>    <span class="hljs-comment">// standard getters and setters</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-symbol">Order</span> &#123;<br>    <span class="hljs-keyword">private</span> User orderingUser;<br>    <span class="hljs-keyword">private</span> List&lt;Product&gt; orderedProducts;<br>    <span class="hljs-keyword">private</span> OrderStatus orderStatus;<br>    <span class="hljs-keyword">private</span> LocalDate orderDate;<br>    <span class="hljs-keyword">private</span> LocalDate orderFinishDate;<br>    <span class="hljs-keyword">private</span> PaymentType paymentType;<br>    <span class="hljs-keyword">private</span> Discount discount;<br>    <span class="hljs-keyword">private</span> <span class="hljs-built_in">int</span> shopId;<br>    <span class="hljs-keyword">private</span> DeliveryData deliveryData;<br>    <span class="hljs-keyword">private</span> Shop offeringShop;<br>    <span class="hljs-comment">// standard getters and setters</span><br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>整个模型结构可以在这里找到:<a target="_blank" rel="noopener" href="https://github.com/eugenp/tutorials/tree/master/performance-tests/src/main/java/com/baeldung/performancetests/model/source%E3%80%82">https://github.com/eugenp/tutorials/tree/master/performance-tests/src/main/java/com/baeldung/performancetests/model/source。</a></p>
 <h2 id="4-转换器"><a href="#4-转换器" class="headerlink" title="4. 转换器"></a>4. 转换器</h2><p>为了简化测试设置的设计，我们创建了如下所示的转换器接口:</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span></span>;<br>    <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span></span>;<br>    <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>我们所有的自定义映射器都将实现这个接口。</p>
 <h3 id="4-1-OrikaConverter"><a href="#4-1-OrikaConverter" class="headerlink" title="4.1. OrikaConverter"></a>4.1. OrikaConverter</h3><p>Orika 支持完整的 API 实现，这大大简化了 mapper 的创建:</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrikaConverter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Converter</span></span>&#123;<br>    <span class="hljs-keyword">private</span> MapperFacade mapperFacade;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">OrikaConverter</span><span class="hljs-params">()</span> </span>&#123;<br>        MapperFactory mapperFactory = <span class="hljs-keyword">new</span> DefaultMapperFactory<br>          .Builder().build();        mapperFactory.classMap(Order.class, SourceOrder.class)<br>          .field(<span class="hljs-string">&quot;orderStatus&quot;</span>, <span class="hljs-string">&quot;status&quot;</span>).byDefault().register();<br>        mapperFacade = mapperFactory.getMapperFacade();<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapperFacade.<span class="hljs-title">map</span><span class="hljs-params">(sourceOrder, Order.class)</span></span>;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapperFacade.<span class="hljs-title">map</span><span class="hljs-params">(sourceCode, DestinationCode.class)</span></span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight aspectj"><table><tr><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrikaConverter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Converter</span></span>&#123;<br>    <span class="hljs-keyword">private</span> MapperFacade mapperFacade;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">OrikaConverter</span><span class="hljs-params">()</span> </span>&#123;<br>        MapperFactory mapperFactory = <span class="hljs-keyword">new</span> DefaultMapperFactory<br>          .Builder().build();        mapperFactory.classMap(Order.class, SourceOrder.class)<br>          .field(<span class="hljs-string">&quot;orderStatus&quot;</span>, <span class="hljs-string">&quot;status&quot;</span>).byDefault().register();<br>        mapperFacade = mapperFactory.getMapperFacade();<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapperFacade.<span class="hljs-title">map</span><span class="hljs-params">(sourceOrder, Order.class)</span></span>;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapperFacade.<span class="hljs-title">map</span><span class="hljs-params">(sourceCode, DestinationCode.class)</span></span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="4-2-DozerConverter"><a href="#4-2-DozerConverter" class="headerlink" title="4.2. DozerConverter"></a>4.2. <strong>DozerConverter</strong></h3><p>Dozer 需要 XML 映射文件，有以下几个部分:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">mappings</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://dozer.sourceforge.net&quot;</span></span><br><span class="hljs-tag">  <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="hljs-tag">  <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://dozer.sourceforge.net</span></span><br><span class="hljs-tag"><span class="hljs-string">  http://dozer.sourceforge.net/schema/beanmapping.xsd&quot;</span>&gt;</span>    <span class="hljs-tag">&lt;<span class="hljs-name">mapping</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-a</span>&gt;</span>com.baeldung.performancetests.model.source.SourceOrder<span class="hljs-tag">&lt;/<span class="hljs-name">class-a</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-b</span>&gt;</span>com.baeldung.performancetests.model.destination.Order<span class="hljs-tag">&lt;/<span class="hljs-name">class-b</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">field</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">a</span>&gt;</span>status<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>orderStatus<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">field</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">mapping</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">mapping</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-a</span>&gt;</span>com.baeldung.performancetests.model.source.SourceCode<span class="hljs-tag">&lt;/<span class="hljs-name">class-a</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-b</span>&gt;</span>com.baeldung.performancetests.model.destination.DestinationCode<span class="hljs-tag">&lt;/<span class="hljs-name">class-b</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">mapping</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">mappings</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">mappings</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">&quot;http://dozer.sourceforge.net&quot;</span></span><br><span class="hljs-tag">  <span class="hljs-attr">xmlns:xsi</span>=<span class="hljs-string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span><br><span class="hljs-tag">  <span class="hljs-attr">xsi:schemaLocation</span>=<span class="hljs-string">&quot;http://dozer.sourceforge.net</span></span><br><span class="hljs-tag"><span class="hljs-string">  http://dozer.sourceforge.net/schema/beanmapping.xsd&quot;</span>&gt;</span>    <span class="hljs-tag">&lt;<span class="hljs-name">mapping</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-a</span>&gt;</span>com.baeldung.performancetests.model.source.SourceOrder<span class="hljs-tag">&lt;/<span class="hljs-name">class-a</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-b</span>&gt;</span>com.baeldung.performancetests.model.destination.Order<span class="hljs-tag">&lt;/<span class="hljs-name">class-b</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">field</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">a</span>&gt;</span>status<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">b</span>&gt;</span>orderStatus<span class="hljs-tag">&lt;/<span class="hljs-name">b</span>&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">field</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">mapping</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">mapping</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-a</span>&gt;</span>com.baeldung.performancetests.model.source.SourceCode<span class="hljs-tag">&lt;/<span class="hljs-name">class-a</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">class-b</span>&gt;</span>com.baeldung.performancetests.model.destination.DestinationCode<span class="hljs-tag">&lt;/<span class="hljs-name">class-b</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">mapping</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">mappings</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>定义了 XML 映射后，我们可以从代码中使用它:</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DozerConverter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Mapper mapper;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">DozerConverter</span><span class="hljs-params">()</span> </span>&#123;<br>        DozerBeanMapper mapper = <span class="hljs-keyword">new</span> DozerBeanMapper();<br>        mapper.addMapping(<br>          DozerConverter.class.getResourceAsStream(<span class="hljs-string">&quot;/dozer-mapping.xml&quot;</span>));<br>        <span class="hljs-keyword">this</span>.mapper = mapper;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceOrder,Order.class)</span></span>;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceCode, DestinationCode.class)</span></span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight aspectj"><table><tr><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DozerConverter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Mapper mapper;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">DozerConverter</span><span class="hljs-params">()</span> </span>&#123;<br>        DozerBeanMapper mapper = <span class="hljs-keyword">new</span> DozerBeanMapper();<br>        mapper.addMapping(<br>          DozerConverter.class.getResourceAsStream(<span class="hljs-string">&quot;/dozer-mapping.xml&quot;</span>));<br>        <span class="hljs-keyword">this</span>.mapper = mapper;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceOrder,Order.class)</span></span>;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> mapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceCode, DestinationCode.class)</span></span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="4-3-MapStructConverter"><a href="#4-3-MapStructConverter" class="headerlink" title="4.3. MapStructConverter"></a>4.3. MapStructConverter</h3><p>Map 结构的定义非常简单，因为它完全基于代码生成:</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-meta">@Mapper</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">MapStructConverter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    MapStructConverter MAPPER = Mappers.getMapper(MapStructConverter.class);    <span class="hljs-meta">@Mapping</span>(source = <span class="hljs-string">&quot;status&quot;</span>, <span class="hljs-keyword">target</span> = <span class="hljs-string">&quot;orderStatus&quot;</span>)<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span></span>;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight aspectj"><table><tr><td class="code"><pre><code class="hljs aspectj"><span class="hljs-meta">@Mapper</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">MapStructConverter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    MapStructConverter MAPPER = Mappers.getMapper(MapStructConverter.class);    <span class="hljs-meta">@Mapping</span>(source = <span class="hljs-string">&quot;status&quot;</span>, <span class="hljs-keyword">target</span> = <span class="hljs-string">&quot;orderStatus&quot;</span>)<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span></span>;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="4-4-JMapperConverter"><a href="#4-4-JMapperConverter" class="headerlink" title="4.4. JMapperConverter"></a>4.4. <strong>JMapperConverter</strong></h3><p>JMapperConverter 需要做更多的工作。接口实现后:</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-built_in">public</span> <span class="hljs-keyword">class</span> JMapperConverter implements Converter &#123;<br>    JMapper realLifeMapper;<br>    JMapper simpleMapper;    <span class="hljs-built_in">public</span> JMapperConverter() &#123;<br>        JMapperAPI api = <span class="hljs-built_in">new</span> JMapperAPI()<br>          .<span class="hljs-keyword">add</span>(JMapperAPI.mappedClass(<span class="hljs-keyword">Order</span>.<span class="hljs-keyword">class</span>));<br>        realLifeMapper = <span class="hljs-built_in">new</span> JMapper(<span class="hljs-keyword">Order</span>.<span class="hljs-keyword">class</span>, SourceOrder.<span class="hljs-keyword">class</span>, api);<br>        JMapperAPI simpleApi = <span class="hljs-built_in">new</span> JMapperAPI()<br>          .<span class="hljs-keyword">add</span>(JMapperAPI.mappedClass(DestinationCode.<span class="hljs-keyword">class</span>));<br>        simpleMapper = <span class="hljs-built_in">new</span> JMapper(<br>          DestinationCode.<span class="hljs-keyword">class</span>, SourceCode.<span class="hljs-keyword">class</span>, simpleApi);<br>    &#125;    @Override<br>    <span class="hljs-built_in">public</span> <span class="hljs-keyword">Order</span> convert(SourceOrder sourceOrder) &#123;<br>        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">Order</span>) realLifeMapper.getDestination(sourceOrder);<br>    &#125;    @Override<br>    <span class="hljs-built_in">public</span> DestinationCode convert(SourceCode sourceCode) &#123;<br>        <span class="hljs-keyword">return</span> (DestinationCode) simpleMapper.getDestination(sourceCode);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><code class="hljs pgsql"><span class="hljs-built_in">public</span> <span class="hljs-keyword">class</span> JMapperConverter implements Converter &#123;<br>    JMapper realLifeMapper;<br>    JMapper simpleMapper;    <span class="hljs-built_in">public</span> JMapperConverter() &#123;<br>        JMapperAPI api = <span class="hljs-built_in">new</span> JMapperAPI()<br>          .<span class="hljs-keyword">add</span>(JMapperAPI.mappedClass(<span class="hljs-keyword">Order</span>.<span class="hljs-keyword">class</span>));<br>        realLifeMapper = <span class="hljs-built_in">new</span> JMapper(<span class="hljs-keyword">Order</span>.<span class="hljs-keyword">class</span>, SourceOrder.<span class="hljs-keyword">class</span>, api);<br>        JMapperAPI simpleApi = <span class="hljs-built_in">new</span> JMapperAPI()<br>          .<span class="hljs-keyword">add</span>(JMapperAPI.mappedClass(DestinationCode.<span class="hljs-keyword">class</span>));<br>        simpleMapper = <span class="hljs-built_in">new</span> JMapper(<br>          DestinationCode.<span class="hljs-keyword">class</span>, SourceCode.<span class="hljs-keyword">class</span>, simpleApi);<br>    &#125;    @Override<br>    <span class="hljs-built_in">public</span> <span class="hljs-keyword">Order</span> convert(SourceOrder sourceOrder) &#123;<br>        <span class="hljs-keyword">return</span> (<span class="hljs-keyword">Order</span>) realLifeMapper.getDestination(sourceOrder);<br>    &#125;    @Override<br>    <span class="hljs-built_in">public</span> DestinationCode convert(SourceCode sourceCode) &#123;<br>        <span class="hljs-keyword">return</span> (DestinationCode) simpleMapper.getDestination(sourceCode);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>我们还需要向目标类的每个字段添加<code>@JMap</code>注释。此外，JMapper 不能在 enum 类型之间转换，它需要我们创建自定义映射函数:</p>
-<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@JMapConversion</span>(<span class="hljs-keyword">from</span> = <span class="hljs-string">&quot;paymentType&quot;</span>, to = <span class="hljs-string">&quot;paymentType&quot;</span>)<br><span class="hljs-keyword">public</span> PaymentType <span class="hljs-function"><span class="hljs-title">conversion</span>(<span class="hljs-params">com.baeldung.performancetests.model.source.PaymentType <span class="hljs-keyword">type</span></span>)</span> &#123;<br>    PaymentType paymentType = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">switch</span>(<span class="hljs-keyword">type</span>) &#123;<br>        <span class="hljs-keyword">case</span> CARD:<br>            paymentType = PaymentType.CARD;<br>            <span class="hljs-keyword">break</span>;        <span class="hljs-keyword">case</span> CASH:<br>            paymentType = PaymentType.CASH;<br>            <span class="hljs-keyword">break</span>;        <span class="hljs-keyword">case</span> TRANSFER:<br>            paymentType = PaymentType.TRANSFER;<br>            <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> paymentType;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@JMapConversion</span>(<span class="hljs-keyword">from</span> = <span class="hljs-string">&quot;paymentType&quot;</span>, to = <span class="hljs-string">&quot;paymentType&quot;</span>)<br><span class="hljs-keyword">public</span> PaymentType <span class="hljs-function"><span class="hljs-title">conversion</span>(<span class="hljs-params">com.baeldung.performancetests.model.source.PaymentType <span class="hljs-keyword">type</span></span>)</span> &#123;<br>    PaymentType paymentType = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">switch</span>(<span class="hljs-keyword">type</span>) &#123;<br>        <span class="hljs-keyword">case</span> CARD:<br>            paymentType = PaymentType.CARD;<br>            <span class="hljs-keyword">break</span>;        <span class="hljs-keyword">case</span> CASH:<br>            paymentType = PaymentType.CASH;<br>            <span class="hljs-keyword">break</span>;        <span class="hljs-keyword">case</span> TRANSFER:<br>            paymentType = PaymentType.TRANSFER;<br>            <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> paymentType;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="4-5-ModelMapperConverter"><a href="#4-5-ModelMapperConverter" class="headerlink" title="4.5. ModelMapperConverter"></a>4.5. <strong>ModelMapperConverter</strong></h3><p>ModelMapperConverter 只需要提供我们想要映射的类:</p>
-<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ModelMapperConverter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> ModelMapper modelMapper;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ModelMapperConverter</span><span class="hljs-params">()</span> </span>&#123;<br>        modelMapper = <span class="hljs-keyword">new</span> ModelMapper();<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span> </span>&#123;<br>       <span class="hljs-function"><span class="hljs-keyword">return</span> modelMapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceOrder, Order.class)</span></span>;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> modelMapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceCode, DestinationCode.class)</span></span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight aspectj"><table><tr><td class="code"><pre><code class="hljs aspectj"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ModelMapperConverter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Converter</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> ModelMapper modelMapper;    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ModelMapperConverter</span><span class="hljs-params">()</span> </span>&#123;<br>        modelMapper = <span class="hljs-keyword">new</span> ModelMapper();<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">Order <span class="hljs-title">convert</span><span class="hljs-params">(SourceOrder sourceOrder)</span> </span>&#123;<br>       <span class="hljs-function"><span class="hljs-keyword">return</span> modelMapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceOrder, Order.class)</span></span>;<br>    &#125;    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function">DestinationCode <span class="hljs-title">convert</span><span class="hljs-params">(SourceCode sourceCode)</span> </span>&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">return</span> modelMapper.<span class="hljs-title">map</span><span class="hljs-params">(sourceCode, DestinationCode.class)</span></span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="5-简单的模型测试"><a href="#5-简单的模型测试" class="headerlink" title="5. 简单的模型测试"></a>5. 简单的模型测试</h2><p>对于性能测试，我们可以使用 Java Microbenchmark Harness，关于如何使用它的更多信息可以在 这篇文章：<a target="_blank" rel="noopener" href="https://www.baeldung.com/java-microbenchmark-harness">https://www.baeldung.com/java-microbenchmark-harness</a> 中找到。</p>
 <p>我们为每个转换器创建了一个单独的基准测试，并将基准测试模式指定为 Mode.All。</p>
 <h3 id="5-1-平均时间"><a href="#5-1-平均时间" class="headerlink" title="5.1. 平均时间"></a>5.1. 平均时间</h3><p>对于平均运行时间，JMH 返回以下结果(越少越好):</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2472732648.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="平均时间.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2472732648.png" alt="平均时间.png"></p>
 <p>这个基准测试清楚地表明，MapStruct 和 JMapper 都有最佳的平均工作时间。</p>
 <h3 id="5-2-吞吐量"><a href="#5-2-吞吐量" class="headerlink" title="5.2. 吞吐量"></a>5.2. 吞吐量</h3><p>在这种模式下，基准测试返回每秒的操作数。我们收到以下结果(越多越好):</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/3516383806.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="吞吐量.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/3516383806.png" alt="吞吐量.png"></p>
 <p>在吞吐量模式中，MapStruct 是测试框架中最快的，JMapper 紧随其后。</p>
 <h3 id="5-3-SingleShotTime"><a href="#5-3-SingleShotTime" class="headerlink" title="5.3. SingleShotTime"></a>5.3. <strong>SingleShotTime</strong></h3><p>这种模式允许测量单个操作从开始到结束的时间。基准给出了以下结果(越少越好):</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/3156994960.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="单例最短时间.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/3156994960.png" alt="单例最短时间.png"></p>
 <p>这里，我们看到 JMapper 返回的结果比 MapStruct 好得多。</p>
 <h3 id="5-4-采样时间"><a href="#5-4-采样时间" class="headerlink" title="5.4. 采样时间"></a>5.4. <strong>采样时间</strong></h3><p>这种模式允许对每个操作的时间进行采样。三个不同百分位数的结果如下:</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2765869866.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="采样时间.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2765869866.png" alt="采样时间.png"></p>
 <p>所有的基准测试都表明，根据场景的不同，MapStruct 和 JMapper 都是不错的选择，尽管 MapStruct 对 SingleShotTime 给出的结果要差得多。</p>
 <h2 id="6-真实模型测试"><a href="#6-真实模型测试" class="headerlink" title="6. 真实模型测试"></a>6. 真实模型测试</h2><p>对于性能测试，我们可以使用 Java Microbenchmark Harness，关于如何使用它的更多信息可以在 这篇文章：<a target="_blank" rel="noopener" href="https://www.baeldung.com/java-microbenchmark-harness">https://www.baeldung.com/java-microbenchmark-harness</a> 中找到。</p>
 <p>我们为每个转换器创建了一个单独的基准测试，并将基准测试模式指定为 Mode.All。</p>
 <h3 id="6-1-平均时间"><a href="#6-1-平均时间" class="headerlink" title="6.1. 平均时间"></a>6.1. 平均时间</h3><p>JMH 返回以下平均运行时间结果（越少越好）：</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2134022080.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="真实模型平均时间.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2134022080.png" alt="真实模型平均时间.png"></p>
 <p>该基准清楚地表明，MapStruct 和 JMapper 均具有最佳的平均工作时间。</p>
 <h3 id="6-2-吞吐量"><a href="#6-2-吞吐量" class="headerlink" title="6.2. 吞吐量"></a>6.2. 吞吐量</h3><p>在这种模式下，基准测试返回每秒的操作数。我们收到以下结果(越多越好):</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2776552119.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="真实模型吞吐量.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/2776552119.png" alt="真实模型吞吐量.png"></p>
 <p>在吞吐量模式中，MapStruct 是测试框架中最快的，JMapper 紧随其后。</p>
 <h3 id="6-3-SingleShotTime"><a href="#6-3-SingleShotTime" class="headerlink" title="6.3. SingleShotTime"></a>6.3. <strong>SingleShotTime</strong></h3><p>这种模式允许测量单个操作从开始到结束的时间。基准给出了以下结果(越少越好):</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/503880226.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="真实模型单例最短时间.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/503880226.png" alt="真实模型单例最短时间.png"></p>
 <h3 id="6-4-采样时间"><a href="#6-4-采样时间" class="headerlink" title="6.4. 采样时间"></a>6.4. <strong>采样时间</strong></h3><p>这种模式允许对每个操作的时间进行采样。三个不同百分位数的结果如下:</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/1520861077.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="真实模型采样时间.png"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/12/1520861077.png" alt="真实模型采样时间.png"></p>
 <p>尽管简单示例和实际示例的确切结果明显不同，但是它们的趋势相同。在哪种算法最快和哪种算法最慢方面，两个示例都给出了相似的结果。</p>
 <h3 id="6-5-结论"><a href="#6-5-结论" class="headerlink" title="6.5. 结论"></a>6.5. 结论</h3><p>根据我们在本节中执行的真实模型测试，我们可以看出，最佳性能显然属于 MapStruct。在相同的测试中，我们看到 Dozer 始终位于结果表的底部。</p>
 <h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. <strong>总结</strong></h2><p>在这篇文章中，我们已经进行了五个流行的 Java Bean 映射框架性能测试：ModelMapper <strong>，</strong> MapStruct <strong>，</strong> Orika ，Dozer， JMapper。</p>
 <p>示例代码地址：<a target="_blank" rel="noopener" href="https://github.com/eugenp/tutorials">https://github.com/eugenp/tutorials</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">鸟不拉诗</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://niaobulashi.com/2020/12/02/2020-12-02-bean-mapper/">https://niaobulashi.com/2020/12/02/2020-12-02-bean-mapper/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://niaobulashi.com" target="_blank">鸟不拉诗</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a></div><div class="post_share"><div class="social-share" data-image="https://images.niaobulashi.com/hexo/niaobulashi/202103/javaBean.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/12/03/2020-12-03-aaa/"><img class="prev-cover" src="https://images.niaobulashi.com/typecho/uploads/2020/12/2758524552.jpg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">长点心吧，已经丢了4把伞了</div></div></a></div><div class="next-post pull-right"><a href="/2020/11/30/2020-11-30-housing-pay-attention-to/"><img class="next-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/202103/dankebaolei.jpg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">蛋壳暴雷之后，租房应该注意什么</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2018/04/22/2018-04-22-linux-mysql-apache-php/" title="Linux搭建mysql、apache、php服务总结"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-04-22</div><div class="title">Linux搭建mysql、apache、php服务总结</div></div></a></div><div><a href="/2018/05/07/2018-05-07-mysql-question/" title="mysql数据库开发常见问题及优化"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/897247-20160625162831875-891132194.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-07</div><div class="title">mysql数据库开发常见问题及优化</div></div></a></div><div><a href="/2018/05/04/2018-05-04-linux-shell/" title="Linux中常用Shell命令"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-04</div><div class="title">Linux中常用Shell命令</div></div></a></div><div><a href="/2018/05/22/2018-05-22-planToSSL/" title="Lets Encrypt证书终于搞定了"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/22222.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-22</div><div class="title">Lets Encrypt证书终于搞定了</div></div></a></div><div><a href="/2018/05/29/2018-05-29-ssl/" title="网站安装SSL证书"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/0c11aec38ad148dc9ce6c2abc8825b4a.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-29</div><div class="title">网站安装SSL证书</div></div></a></div><div><a href="/2018/05/30/2018-05-30-exception/" title="谈谈你对Java异常处理机制的理解？"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/20200809111855958.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-30</div><div class="title">谈谈你对Java异常处理机制的理解？</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/><div class="author-info__name">鸟不拉诗</div><div class="author-info__description">品味生活，分享技术</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/niaobulashi" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hulang6666@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">1. 介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%B8%B8%E8%A7%81-Bean-%E6%98%A0%E5%B0%84%E6%A1%86%E6%9E%B6%E6%A6%82%E8%A7%88"><span class="toc-number">2.</span> <span class="toc-text">2. 常见 Bean 映射框架概览</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Dozer"><span class="toc-number">2.1.</span> <span class="toc-text">2.1. Dozer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Orika"><span class="toc-number">2.2.</span> <span class="toc-text">2.2. Orika</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-MapStruct"><span class="toc-number">2.3.</span> <span class="toc-text">2.3. MapStruct</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-ModelMapper"><span class="toc-number">2.4.</span> <span class="toc-text">2.4. ModelMapper</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-JMapper"><span class="toc-number">2.5.</span> <span class="toc-text">2.5. JMapper</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%B5%8B%E8%AF%95%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">3.测试模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%BD%AC%E6%8D%A2%E5%99%A8"><span class="toc-number">4.</span> <span class="toc-text">4. 转换器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-OrikaConverter"><span class="toc-number">4.1.</span> <span class="toc-text">4.1. OrikaConverter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-DozerConverter"><span class="toc-number">4.2.</span> <span class="toc-text">4.2. DozerConverter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-MapStructConverter"><span class="toc-number">4.3.</span> <span class="toc-text">4.3. MapStructConverter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-JMapperConverter"><span class="toc-number">4.4.</span> <span class="toc-text">4.4. JMapperConverter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-ModelMapperConverter"><span class="toc-number">4.5.</span> <span class="toc-text">4.5. ModelMapperConverter</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%AE%80%E5%8D%95%E7%9A%84%E6%A8%A1%E5%9E%8B%E6%B5%8B%E8%AF%95"><span class="toc-number">5.</span> <span class="toc-text">5. 简单的模型测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%B9%B3%E5%9D%87%E6%97%B6%E9%97%B4"><span class="toc-number">5.1.</span> <span class="toc-text">5.1. 平均时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%90%9E%E5%90%90%E9%87%8F"><span class="toc-number">5.2.</span> <span class="toc-text">5.2. 吞吐量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-SingleShotTime"><span class="toc-number">5.3.</span> <span class="toc-text">5.3. SingleShotTime</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E9%87%87%E6%A0%B7%E6%97%B6%E9%97%B4"><span class="toc-number">5.4.</span> <span class="toc-text">5.4. 采样时间</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E7%9C%9F%E5%AE%9E%E6%A8%A1%E5%9E%8B%E6%B5%8B%E8%AF%95"><span class="toc-number">6.</span> <span class="toc-text">6. 真实模型测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E5%B9%B3%E5%9D%87%E6%97%B6%E9%97%B4"><span class="toc-number">6.1.</span> <span class="toc-text">6.1. 平均时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%90%9E%E5%90%90%E9%87%8F"><span class="toc-number">6.2.</span> <span class="toc-text">6.2. 吞吐量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-SingleShotTime"><span class="toc-number">6.3.</span> <span class="toc-text">6.3. SingleShotTime</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-%E9%87%87%E6%A0%B7%E6%97%B6%E9%97%B4"><span class="toc-number">6.4.</span> <span class="toc-text">6.4. 采样时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-5-%E7%BB%93%E8%AE%BA"><span class="toc-number">6.5.</span> <span class="toc-text">6.5. 结论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">7. 总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询"><img src="https://images.niaobulashi.com/hexo/niaobulashi/2019/wuyi.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="假期余额查询"/></a><div class="content"><a class="title" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询">假期余额查询</a><time datetime="2021-04-30T03:12:10.000Z" title="发表于 2021-04-30 11:12:10">2021-04-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="下班去大雁塔溜达"/></a><div class="content"><a class="title" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达">下班去大雁塔溜达</a><time datetime="2021-04-29T02:24:30.000Z" title="发表于 2021-04-29 10:24:30">2021-04-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="秒杀业务方案思路"/></a><div class="content"><a class="title" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路">秒杀业务方案思路</a><time datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="逛一逛大唐芙蓉园"/></a><div class="content"><a class="title" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园">逛一逛大唐芙蓉园</a><time datetime="2021-04-26T04:40:30.000Z" title="发表于 2021-04-26 12:40:30">2021-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/45461931fa6a4133920f84f7271d262e.jpeg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="我国适龄儿童可免费接种15种疫苗"/></a><div class="content"><a class="title" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗">我国适龄儿童可免费接种15种疫苗</a><time datetime="2021-04-25T03:33:30.000Z" title="发表于 2021-04-25 11:33:30">2021-04-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By 鸟不拉诗</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/12/03/2020-12-03-aaa/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">长点心吧，已经丢了4把伞了</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2020/11/30/2020-11-30-housing-pay-attention-to/">
-                        <span class="hidden-mobile">蛋壳暴雷之后，租房应该注意什么</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.lazyComments('valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
-        new Valine({
-          el: "#valine",
-          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
-          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
-          placeholder: "说点什么~",
-          path: window.location.pathname,
-          avatar: "retro",
-          meta: ["nick","mail","link"],
-          pageSize: "10",
-          lang: "zh-CN",
-          highlight: false,
-          recordIP: false,
-          serverURLs: "",
-        });
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the
-    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
-  </noscript>
+document.addEventListener('DOMContentLoaded', panguInit)</script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
 
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz',
+      appKey: 'WsdLwIB6AC0kk3T7hHhFJPO2',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
 
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
 
-      </div>
-    
-  </div>
-</div>
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
 
-<!-- Custom -->
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
 
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
 
-    
+document.addEventListener('pjax:send', function () {
 
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
+  // removeEventListener toc scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-      <div class="col-lg-7 mx-auto nopadding-x-md">
-        <div class="container custom mx-auto">
-           <script src="/js/sidecar.v1.js" async defer></script> <script> ((window.gitter = {}).chat = {}).options = { room: "niaobulashi/Lobby" }; </script> 
-        </div>
-      </div>
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://niaobulashi.com/atom" target="_blank" rel="nofollow noopener"><span>SSR</span></a> <i class="iconfont icon-love"></i> <a href="https://www.upyun.com/" rel="external nofollow" target="_blank"><img style="vertical-align:middle" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/yun_logo6.png" class="lazyload"></a> 
-  </div>
+  typeof preloader === 'object' && preloader.initLoading()
   
-  <div class="statistics">
-    
-    
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
 
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
+  typeof typed === 'object' && typed.destroy()
 
-    
-  </div>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
 
+})
 
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        鄂ICP备17026246号-1
-      </a>
-    </span>
-    
-  </div>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
-  
-</footer>
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
 
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'G-5VCD453CKL', {'page_path': window.location.pathname});
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
 
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
 
-<!-- Plugins -->
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
 
+  typeof preloader === 'object' && preloader.endLoading()
+})
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-5VCD453CKL', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5VCD453CKL');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

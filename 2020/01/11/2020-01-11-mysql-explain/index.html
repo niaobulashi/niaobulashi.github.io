@@ -1,267 +1,167 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mysql的Explain使用及索引总结 | 鸟不拉诗</title><meta name="keywords" content="Java,Mysql"><meta name="author" content="鸟不拉诗"><meta name="copyright" content="鸟不拉诗"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Explain工具介绍使用EXPLAIN关键字可以模拟优化器执行SQL语句，分析你的查询语句或是结构的性能瓶颈在 select 语句之前增加 explain 关键字，MySQL 会在查询上设置一个标记，执行查询会返回执行计划的信息，而不是执行这条SQL注意：如果 from 中包含子查询，仍会执行该子查询，将结果放入临时表中。 actor建表语句 DROP TABLE IF EXISTS &#96;acto">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql的Explain使用及索引总结">
+<meta property="og:url" content="https://niaobulashi.com/2020/01/11/2020-01-11-mysql-explain/index.html">
+<meta property="og:site_name" content="鸟不拉诗">
+<meta property="og:description" content="Explain工具介绍使用EXPLAIN关键字可以模拟优化器执行SQL语句，分析你的查询语句或是结构的性能瓶颈在 select 语句之前增加 explain 关键字，MySQL 会在查询上设置一个标记，执行查询会返回执行计划的信息，而不是执行这条SQL注意：如果 from 中包含子查询，仍会执行该子查询，将结果放入临时表中。 actor建表语句 DROP TABLE IF EXISTS &#96;acto">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.niaobulashi.com/hexo/niaobulashi/2020/mysql Explain.png">
+<meta property="article:published_time" content="2020-01-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-30T02:54:59.749Z">
+<meta property="article:author" content="鸟不拉诗">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.niaobulashi.com/hexo/niaobulashi/2020/mysql Explain.png"><link rel="shortcut icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico"><link rel="canonical" href="https://niaobulashi.com/2020/01/11/2020-01-11-mysql-explain/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google_site_verification" content="G-5VCD453CKL"/><meta name="baidu_site_verification" content="ffb42684ee1a6179af94ba8bc1920e42"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5VCD453CKL');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Mysql的Explain使用及索引总结',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-30 10:54:59'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
 
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
 
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
 
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
-  <meta name="author" content="niaobulashi">
-  <meta name="keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,品味生活，分享技术,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-     <meta name="Keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录,品味生活，分享技术"/> <meta http-equiv="x-ua-compatible" content="IE=edge"> <meta name="mobile-agent" content="format=xhtml;url=https://niaobulashi.com/" /> <meta name="mobile-agent" content="format=html5;url=https://niaobulashi.com/" /> 
-  
-  <title>Mysql的Explain使用及索引总结 - 鸟不拉诗</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/banner/20210426125918.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Mysql的Explain使用及索引总结">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-01-11 00:00" pubdate>
-        2020年1月11日 凌晨
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      4.7k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      57
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Mysql的Explain使用及索引总结</h1>
-            
-            <div class="markdown-body">
-              <h2 id="Explain工具介绍"><a href="#Explain工具介绍" class="headerlink" title="Explain工具介绍"></a>Explain工具介绍</h2><p>使用EXPLAIN关键字可以模拟优化器执行SQL语句，分析你的查询语句或是结构的性能瓶颈<br>在 select 语句之前增加 explain 关键字，MySQL 会在查询上设置一个标记，执行查询会返<br>回执行计划的信息，而不是执行这条SQL<br>注意：如果 from 中包含子查询，仍会执行该子查询，将结果放入临时表中。</p>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">鸟不拉诗</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Mysql的Explain使用及索引总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-01-10T16:00:00.000Z" title="发表于 2020-01-11 00:00:00">2020-01-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-30T02:54:59.749Z" title="更新于 2021-04-30 10:54:59">2021-04-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>16分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Mysql的Explain使用及索引总结"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="Explain工具介绍"><a href="#Explain工具介绍" class="headerlink" title="Explain工具介绍"></a>Explain工具介绍</h2><p>使用EXPLAIN关键字可以模拟优化器执行SQL语句，分析你的查询语句或是结构的性能瓶颈<br>在 select 语句之前增加 explain 关键字，MySQL 会在查询上设置一个标记，执行查询会返<br>回执行计划的信息，而不是执行这条SQL<br>注意：如果 from 中包含子查询，仍会执行该子查询，将结果放入临时表中。</p>
 <p>actor建表语句</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `actor`;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `actor` (<br>  `id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT,<br>  `name` <span class="hljs-type">varchar</span>(<span class="hljs-number">45</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  `update_time` datetime <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  <span class="hljs-keyword">PRIMARY</span> KEY (`id`)<br>) ENGINE<span class="hljs-operator">=</span>InnoDB AUTO_INCREMENT<span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-comment">-- Records of actor</span><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-string">&#x27;2020-01-11 19:57:26&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;2020-01-11 19:57:38&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;c&#x27;</span>, <span class="hljs-string">&#x27;2020-01-11 19:57:57&#x27;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `actor`;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `actor` (<br>  `id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT,<br>  `name` <span class="hljs-type">varchar</span>(<span class="hljs-number">45</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  `update_time` datetime <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  <span class="hljs-keyword">PRIMARY</span> KEY (`id`)<br>) ENGINE<span class="hljs-operator">=</span>InnoDB AUTO_INCREMENT<span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-comment">-- Records of actor</span><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-string">&#x27;2020-01-11 19:57:26&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;2020-01-11 19:57:38&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;c&#x27;</span>, <span class="hljs-string">&#x27;2020-01-11 19:57:57&#x27;</span>);<br></code></pre></td></tr></table></figure>
 
 <p>film建表语句</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `film`;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `film` (<br>  `id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT,<br>  `name` <span class="hljs-type">varchar</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  <span class="hljs-keyword">PRIMARY</span> KEY (`id`),<br>  KEY `idx_name` (`name`) <span class="hljs-keyword">USING</span> BTREE<br>) ENGINE<span class="hljs-operator">=</span>InnoDB AUTO_INCREMENT<span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-comment">-- Records of film</span><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `film` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;film0&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `film` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;film1&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `film` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;film2&#x27;</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `film`;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `film` (<br>  `id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT,<br>  `name` <span class="hljs-type">varchar</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  <span class="hljs-keyword">PRIMARY</span> KEY (`id`),<br>  KEY `idx_name` (`name`) <span class="hljs-keyword">USING</span> BTREE<br>) ENGINE<span class="hljs-operator">=</span>InnoDB AUTO_INCREMENT<span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-comment">-- Records of film</span><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `film` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;film0&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `film` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;film1&#x27;</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `film` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;film2&#x27;</span>);<br></code></pre></td></tr></table></figure>
 
 <p>film_actor建表语句</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `file_actor`;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `file_actor` (<br>  `id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT,<br>  `film_id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  `actor_id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  `remark` <span class="hljs-type">varchar</span>(<span class="hljs-number">25</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  <span class="hljs-keyword">PRIMARY</span> KEY (`id`),<br>  KEY `idx_film_actor_id` (`film_id`,`actor_id`)<br>) ENGINE<span class="hljs-operator">=</span>InnoDB AUTO_INCREMENT<span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-comment">-- Records of file_actor</span><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `file_actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-keyword">null</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `file_actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-keyword">null</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `file_actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-keyword">null</span>);<br></code></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> `file_actor`;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> `file_actor` (<br>  `id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT,<br>  `film_id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  `actor_id` <span class="hljs-type">int</span>(<span class="hljs-number">11</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,<br>  `remark` <span class="hljs-type">varchar</span>(<span class="hljs-number">25</span>) <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">NULL</span>,<br>  <span class="hljs-keyword">PRIMARY</span> KEY (`id`),<br>  KEY `idx_film_actor_id` (`film_id`,`actor_id`)<br>) ENGINE<span class="hljs-operator">=</span>InnoDB AUTO_INCREMENT<span class="hljs-operator">=</span><span class="hljs-number">4</span> <span class="hljs-keyword">DEFAULT</span> CHARSET<span class="hljs-operator">=</span>utf8;<br><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-comment">-- Records of file_actor</span><br><span class="hljs-comment">-- ----------------------------</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `file_actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-keyword">null</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `file_actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-keyword">null</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> `file_actor` <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;3&#x27;</span>, <span class="hljs-string">&#x27;2&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-keyword">null</span>);<br></code></pre></td></tr></table></figure>
 
 <p>Explain展示的字段</p>
 <h2 id="explain列"><a href="#explain列" class="headerlink" title="explain列"></a>explain列</h2><p>展示explain中的每个列的信息。</p>
@@ -276,34 +176,34 @@
 <li>primary：复杂查询中最外层的select</li>
 </ol>
 <p>3）subquery：包含在 select 中的子查询（不在 from 子句中）<br>4）derived：包含在 from 子句中的子查询。MySQL会将结果存放在一个临时表中，也称为<br>派生表（derived的英文含义）<br>用这个例子来了解 primary、subquery 和 derived 类型<br>mysql&gt; set session optimizer_switch=’derived_merge=off’;   #关闭mysql5.7新特性对衍<br>生表的合并优化<br>mysql&gt; explain select (select 1 from actor where id = 1) from (select * from film<br>where id = 1) der;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/2716589489.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578737130125"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/2716589489.png" alt="1578737130125"></p>
 <p>mysql&gt; set session optimizer_switch=’derived_merge=on’; #还原默认配置</p>
 <p>5）union：在 union 中的第二个和随后的 select</p>
 <p>mysql&gt; explain select 1 union all select 1;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1013800051.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578737906626"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1013800051.png" alt="1578737906626"></p>
 <h4 id="3、table列"><a href="#3、table列" class="headerlink" title="3、table列"></a>3、table列</h4><p>这一列表示 explain 的一行正在访问哪个表。<br>当 from 子句中有子查询时，table列是 <derivenN> 格式，表示当前查询依赖 id=N 的查<br>询，于是先执行 id=N 的查询。<br>当有 union 时，UNION RESULT 的 table 列的值为&lt;union1,2&gt;，1和2表示参与 union 的<br>select 行id。</p>
 <h4 id="4、type列"><a href="#4、type列" class="headerlink" title="4、type列"></a>4、type列</h4><p>这一列表示关联类型或访问类型，即MySQL决定如何查找表中的行，查找数据行记录的大概<br>范围。<br>依次从<strong>最优到最差</strong>分别为：system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL<br>一般来说，得保证查询达到range级别，最好达到ref<br>NULL：mysql能够在优化阶段分解查询语句，在执行阶段用不着再访问表或索引。例如：在<br>索引列中选取最小值，可以单独查找索引来完成，不需要在执行时访问表<br>mysql&gt; explain select min(id) from film;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/521284259.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578738042346"><br>const, system：mysql能对查询的某部分进行优化并将其转化成一个常量（可以看show<br>warnings 的结果）。用于 primary key 或 unique key 的所有列与常数比较时，所以表最多<br>有一个匹配行，读取1次，速度比较快。system是const的特例，表里只有一条元组匹配时为<br>system<br>mysql&gt; explain extended select * from (select * from film where id = 1) tmp;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1588839168.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578738056468"><br>mysql&gt; show warnings;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/902622157.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578738061877"><br>eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合<br>条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种<br>type。<br>mysql&gt; explain select * from film_actor left join film on film_actor.film_id = film.id;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/296224253.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578738068602"><br>ref：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要<br>和某个值相比较，可能会找到多个符合条件的行。</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/521284259.png" alt="1578738042346"><br>const, system：mysql能对查询的某部分进行优化并将其转化成一个常量（可以看show<br>warnings 的结果）。用于 primary key 或 unique key 的所有列与常数比较时，所以表最多<br>有一个匹配行，读取1次，速度比较快。system是const的特例，表里只有一条元组匹配时为<br>system<br>mysql&gt; explain extended select * from (select * from film where id = 1) tmp;</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1588839168.png" alt="1578738056468"><br>mysql&gt; show warnings;</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/902622157.png" alt="1578738061877"><br>eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合<br>条件的记录。这可能是在 const 之外最好的联接类型了，简单的 select 查询不会出现这种<br>type。<br>mysql&gt; explain select * from film_actor left join film on film_actor.film_id = film.id;</p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/296224253.png" alt="1578738068602"><br>ref：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要<br>和某个值相比较，可能会找到多个符合条件的行。</p>
 <ol>
 <li><p>简单 select 查询，name是普通索引（非唯一索引）<br>mysql&gt; explain select * from film where name = ‘film1’;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/2580514485.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578744663729"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/2580514485.png" alt="1578744663729"></p>
 </li>
 <li><p>关联表查询，idx_film_actor_id是film_id和actor_id的联合索引，这里使用到了film_actor<br>的左边前缀film_id部分。<br>mysql&gt; explain select film_id from film left join film_actor on film.id =<br>film_actor.film_id;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/173014895.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578744633297"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/173014895.png" alt="1578744633297"></p>
 <p>range：范围扫描通常出现在 in(), between ,&gt; ,&lt;, &gt;= 等操作中。使用一个索引来检索给定<br>范围的行。<br>mysql&gt; explain select * from actor where id &gt; 1;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3698856681.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578744638020"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3698856681.png" alt="1578744638020"></p>
 <p>index：扫描全表索引，这通常比ALL快一些。<br>mysql&gt; explain select * from film;</p>
 <p>ALL：即全表扫描，意味着mysql需要从头到尾去查找所需要的行。通常情况下这需要增加索<br>引来进行优化了<br>mysql&gt; explain select * from actor;</p>
 </li>
 </ol>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1898987101.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578744600423"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1898987101.png" alt="1578744600423"></p>
 <h4 id="5、possible-keys列"><a href="#5、possible-keys列" class="headerlink" title="5、possible_keys列"></a>5、possible_keys列</h4><p>这一列显示查询可能使用哪些索引来查找。<br>explain 时可能出现 possible_keys 有列，而 key 显示 NULL 的情况，这种情况是因为表中<br>数据不多，mysql认为索引对此查询帮助不大，选择了全表查询。<br>如果该列是NULL，则没有相关的索引。在这种情况下，可以通过检查 where 子句看是否可<br>以创造一个适当的索引来提高查询性能，然后用 explain 查看效果。</p>
 <h4 id="6、key列"><a href="#6、key列" class="headerlink" title="6、key列"></a>6、key列</h4><p>这一列显示mysql实际采用哪个索引来优化对该表的访问。<br>如果没有使用索引，则该列是 NULL。如果想强制mysql使用或忽视possible_keys列中的索<br>引，在查询中使用 force index、ignore index。</p>
 <h4 id="7、key-len列"><a href="#7、key-len列" class="headerlink" title="7、key_len列"></a>7、key_len列</h4><p>这一列显示了mysql在索引里使用的字节数，通过这个值可以算出具体使用了索引中的哪些<br>列。<br>举例来说，film_actor的联合索引 idx_film_actor_id 由 film_id 和 actor_id 两个int列组成，<br>并且每个int是4字节。通过结果中的key_len=4可推断出查询使用了第一个列：film_id列来执<br>行索引查找。<br>mysql&gt; explain select * from film_actor where film_id = 2;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/45810768.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578745125184"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/45810768.png" alt="1578745125184"></p>
 <p>key_len计算规则如下：</p>
 <ul>
 <li><p>字符串</p>
@@ -323,25 +223,25 @@
 <h4 id="8、ref列"><a href="#8、ref列" class="headerlink" title="8、ref列"></a>8、ref列</h4><p>这一列显示了在key列记录的索引中，表查找值所用到的列或常量，常见的有：const（常<br>量），字段名（例：film.id）</p>
 <h4 id="9、rows列"><a href="#9、rows列" class="headerlink" title="9、rows列"></a>9、rows列</h4><p>这一列是mysql估计要读取并检测的行数，注意这个不是结果集里的行数。</p>
 <h4 id="10、Extra列"><a href="#10、Extra列" class="headerlink" title="10、Extra列"></a>10、Extra列</h4><p>这一列展示的是额外信息。常见的重要值如下：<br>1）Using index：使用覆盖索引<br>mysql&gt; explain select film_id from film_actor where film_id = 1;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3956387964.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578745277257"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3956387964.png" alt="1578745277257"></p>
 <p>2）Using where：使用 where 语句来处理结果，查询的列未被索引覆盖</p>
 <p>mysql&gt; explain select * from actor where name = ‘a’;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1722679615.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578745291241"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/1722679615.png" alt="1578745291241"></p>
 <p>3）Using index condition：查询的列不完全被索引覆盖，where条件中是一个前导列的范<br>围；</p>
 <p>mysql&gt; explain select * from film_actor where film_id &gt; 1;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3678510800.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746022429"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3678510800.png" alt="1578746022429"></p>
 <p>4）Using temporary：mysql需要创建一张临时表来处理查询。出现这种情况一般是要进行<br>优化的，首先是想到用索引来优化。</p>
 <p>1、actor.name没有索引，此时创建了张临时表来distinct<br>mysql&gt; explain select distinct name from actor;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3121044303.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746041902"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3121044303.png" alt="1578746041902"></p>
 <p>2、film.name建立了idx_name索引，此时查询时extra是using index,没有用临时表<br>mysql&gt; explain select distinct name from film;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/941771548.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746057709"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/941771548.png" alt="1578746057709"></p>
 <p>5）Using filesort：将用外部排序而不是索引排序，数据较小时从内存排序，否则需要在磁盘<br>完成排序。这种情况下一般也是要考虑使用索引来优化的。</p>
 <p>1、actor.name未创建索引，会浏览actor整个表，保存排序关键字name和对应的id，然后排<br>序name并检索行记录<br>mysql&gt; explain select * from actor order by name;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/4045994156.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746090990"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/4045994156.png" alt="1578746090990"></p>
 <p>2、film.name建立了idx_name索引,此时查询时extra是using index<br>mysql&gt; explain select * from film order by name;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/919562841.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746100958"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/919562841.png" alt="1578746100958"></p>
 <p>6）Select tables optimized away：使用某些聚合函数（比如 max、min）来访问存在索引<br>的某个字段是<br>mysql&gt; explain select min(id) from film;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/2021516824.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746115229"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/2021516824.png" alt="1578746115229"></p>
 <h2 id="Using-filesort文件排序原理详解"><a href="#Using-filesort文件排序原理详解" class="headerlink" title="Using filesort文件排序原理详解"></a>Using filesort文件排序原理详解</h2><h4 id="filesort文件排序方式"><a href="#filesort文件排序方式" class="headerlink" title="filesort文件排序方式"></a>filesort文件排序方式</h4><p>单路排序：是一次性取出满足条件行的所有字段，然后在sort buffer中进行排序；用trace工具可<br>以看到sort_mode信息里显示&lt; sort_key, additional_fields &gt;或者&lt; sort_key,<br>packed_additional_fields &gt;</p>
 <p>双路排序（又叫回表排序模式）：是首先根据相应的条件取出相应的排序字段和可以直接定位行<br>数据的行 ID，然后在 sort buffer 中进行排序，排序完后需要再次取回其它需要的字段；用trace工具<br>可以看到sort_mode信息里显示&lt; sort_key, rowid &gt;</p>
 <p>MySQL 通过比较系统变量 max_length_for_sort_data(默认1024字节) 的大小和需要查询的字段总大小来<br>判断使用哪种排序模式。<br>如果 max_length_for_sort_data 比查询字段的总长度大，那么使用 单路排序模式；<br>如果 max_length_for_sort_data 比查询字段的总长度小，那么使用 双路排序模式。</p>
@@ -376,7 +276,7 @@
 <li>Block Nested-Loop Join 算法</li>
 </ul>
 <h4 id="嵌套循环连接-Nested-Loop-Join-NLJ-算法"><a href="#嵌套循环连接-Nested-Loop-Join-NLJ-算法" class="headerlink" title="嵌套循环连接 Nested-Loop Join(NLJ) 算法"></a>嵌套循环连接 Nested-Loop Join(NLJ) 算法</h4><p>一次一行循环地从第一张表（称为驱动表）中读取行，在这行数据中取到关联字段，根据关联字段在另一张表（被驱动<br>表）里取出满足条件的行，然后取出两张表的结果合集。<br>mysql&gt; EXPLAIN select*from t1 inner join t2 on t1.a= t2.a;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3786110290.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578748848466"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/3786110290.png" alt="1578748848466"></p>
 <p>从执行计划中可以看到这些信息：<br>驱动表是 t2，被驱动表是 t1。先执行的就是驱动表(执行计划结果的id如果一样则按从上到下顺序执行sql)；优<br>化器一般会优先选择小表做驱动表。所以使用 inner join 时，排在前面的表并不一定就是驱动表。<br>使用了 NLJ算法。一般 join 语句中，如果执行计划 Extra 中未出现 Using join buffer 则表示使用的 join 算<br>法是 NLJ。<br>上面sql的大致流程如下：</p>
 <ol>
 <li>从表 t2 中读取一行数据；</li>
@@ -386,7 +286,7 @@
 </ol>
 <p>整个过程会读取 t2 表的所有数据(扫描100行)，然后遍历这每行数据中字段 a 的值，根据 t2 表中 a 的值索引扫描 t1 表<br>   中的对应行(扫描100次 t1 表的索引，1次扫描可以认为最终只扫描 t1 表一行完整数据，也就是总共 t1 表也扫描了100<br>   行)。因此整个过程扫描了 200 行。<br>   如果被驱动表的关联字段没索引，使用NLJ算法性能会比较低(下面有详细解释)，mysql会选择Block Nested-Loop Join<br>   算法。</p>
 <h4 id="基于块的嵌套循环连接-Block-Nested-Loop-Join-BNL-算法"><a href="#基于块的嵌套循环连接-Block-Nested-Loop-Join-BNL-算法" class="headerlink" title="基于块的嵌套循环连接 Block Nested-Loop Join( BNL )算法"></a>基于块的嵌套循环连接 Block Nested-Loop Join( BNL )算法</h4><p>把驱动表的数据读入到 join_buffer 中，然后扫描被驱动表，把被驱动表每一行取出来跟 join_buffer 中的数据做对比。<br>mysql&gt;EXPLAIN select*from t1 inner join t2 on t1.b= t2.b;</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/139960535.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578748917735"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/139960535.png" alt="1578748917735"></p>
 <p>Extra 中 的Using join buffer (Block Nested Loop)说明该关联查询使用的是 BNL 算法。<br>上面sql的大致流程如下：</p>
 <ol>
 <li>把 t2 的所有数据放入到 join_buffer 中</li>
@@ -397,10 +297,10 @@
 <p>被驱动表的关联字段没索引为什么要选择使用 BNL 算法而不使用 Nested-Loop Join 呢？</p>
 <p>如果上面第二条sql使用 Nested-Loop Join，那么扫描行数为 100 * 10000 = 100万次，这个是磁盘扫描。<br>很显然，用BNL磁盘扫描次数少很多，相比于磁盘扫描，BNL的内存计算会快得多。<br>因此MySQL对于被驱动表的关联字段没索引的关联查询，一般都会使用 BNL 算法。如果有索引一般选择 NLJ 算法，有<br>索引的情况下 NLJ 算法比 BNL算法性能更高</p>
 <h2 id="对于关联sql的优化"><a href="#对于关联sql的优化" class="headerlink" title="对于关联sql的优化"></a>对于关联sql的优化</h2><p>关联字段加索引，让mysql做join操作时尽量选择NLJ算法<br>小标驱动大表，写多表连接sql时如果明确知道哪张表是小表可以用straight_join写法固定连接驱动方式，省去<br>mysql优化器自己判断的时间<br>straight_join解释：straight_join功能同join类似，但能让左边的表来驱动右边的表，能改表优化器对于联表查询的执<br>行顺序。<br>比如：select * from t2 straight_join t1 on t2.a = t1.a; 代表制定mysql选着 t2 表作为驱动表。<br>straight_join只适用于inner join，并不适用于left join，right join。（因为left join，right join已经代表指<br>定了表的执行顺序）<br>尽可能让优化器去判断，因为大部分情况下mysql优化器是比人要聪明的。使用straight_join一定要慎重，因<br>为部分情况下人为指定的执行顺序并不一定会比优化引擎要靠谱。<br>in和exsits优化<br>原则：小表驱动大表，即小的数据集驱动大的数据集<br>in：当B表的数据集小于A表的数据集时，in优于exists</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> A <span class="hljs-keyword">where</span> id <span class="hljs-keyword">in</span> (<span class="hljs-keyword">select</span> id <span class="hljs-keyword">from</span> B)<br> #等价于：<br>   for(select id from B)&#123;<br>  <span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> A <span class="hljs-keyword">where</span> A.id <span class="hljs-operator">=</span> B.id<br>  &#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> A <span class="hljs-keyword">where</span> id <span class="hljs-keyword">in</span> (<span class="hljs-keyword">select</span> id <span class="hljs-keyword">from</span> B)<br> #等价于：<br>   for(select id from B)&#123;<br>  <span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> A <span class="hljs-keyword">where</span> A.id <span class="hljs-operator">=</span> B.id<br>  &#125;<br></code></pre></td></tr></table></figure>
 
 <p>exis`ts：当A表的数据集小于B表的数据集时，exists优于in<br>　　将主查询A的数据，放到子查询B中做条件验证，根据验证结果（true或false）来决定主查询的数据是否保留</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"> <span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> A <span class="hljs-keyword">where</span> <span class="hljs-keyword">exists</span> (<span class="hljs-keyword">select</span> <span class="hljs-number">1</span> <span class="hljs-keyword">from</span> B <span class="hljs-keyword">where</span> B.id <span class="hljs-operator">=</span> A.id)<br> #等价于:<br>for(select * from A) &#123;<br>  <span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> B <span class="hljs-keyword">where</span> B.id <span class="hljs-operator">=</span> A.id<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="code"><pre><code class="hljs sql"> <span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> A <span class="hljs-keyword">where</span> <span class="hljs-keyword">exists</span> (<span class="hljs-keyword">select</span> <span class="hljs-number">1</span> <span class="hljs-keyword">from</span> B <span class="hljs-keyword">where</span> B.id <span class="hljs-operator">=</span> A.id)<br> #等价于:<br>for(select * from A) &#123;<br>  <span class="hljs-keyword">select</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">from</span> B <span class="hljs-keyword">where</span> B.id <span class="hljs-operator">=</span> A.id<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>#A表与B表的ID字段应建立索引<br>1、EXISTS (subquery)只返回TRUE或FALSE,因此子查询中的SELECT * 也可以用SELECT 1替换,官方说法是实际执行时会<br>忽略SELECT清单,因此没有区别<br>2、EXISTS子查询的实际执行过程可能经过了优化而不是我们理解上的逐条对比<br>3、EXISTS子查询往往也可以用JOIN来代替，何种最优需要具体问题具体分析</p>
 <h2 id="索引最佳实践"><a href="#索引最佳实践" class="headerlink" title="索引最佳实践"></a>索引最佳实践</h2><p>1.全值匹配</p>
@@ -415,346 +315,151 @@
 <p>10.少用or或in，用它查询时，mysql不一定使用索引，mysql内部优化器会根据检索比例、<br>表大小等多个因素整体评估是否使用索引，详见范围查询优化</p>
 <p>11.范围查询优化(缩小范围)</p>
 <p>12.查询个数推荐使用count(*)</p>
-<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/4263609658.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="1578746314207"></p>
+<p><img src="https://images.niaobulashi.com/typecho/uploads/2020/01/4263609658.png" alt="1578746314207"></p>
 <p>like KK%相当于=常量，%KK和%KK% 相当于范围</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">鸟不拉诗</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://niaobulashi.com/2020/01/11/2020-01-11-mysql-explain/">https://niaobulashi.com/2020/01/11/2020-01-11-mysql-explain/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://niaobulashi.com" target="_blank">鸟不拉诗</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Mysql/">Mysql</a></div><div class="post_share"><div class="social-share" data-image="https://images.niaobulashi.com/hexo/niaobulashi/2020/mysql Explain.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/01/12/2020-01-12-mysql-transaction-mvcc/"><img class="prev-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2020/MVCC.jpg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Mysql锁、事务隔离级别、MVCC底层原理机制</div></div></a></div><div class="next-post pull-right"><a href="/2020/01/10/2020-01-10-payment-interface/"><img class="next-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2020/pay.jpg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">网上支付平台接口使用总结</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2018/05/07/2018-05-07-mysql-question/" title="mysql数据库开发常见问题及优化"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/897247-20160625162831875-891132194.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-07</div><div class="title">mysql数据库开发常见问题及优化</div></div></a></div><div><a href="/2020/11/25/2020-11-25-select-mysql-index/" title="Mysql索引类型如何选择？"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/202103/mysqlIndex.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-11-25</div><div class="title">Mysql索引类型如何选择？</div></div></a></div><div><a href="/2019/08/30/2019-08-30-mysql-indexes/" title="性能调优-Mysql索引数据结构详解与索引优化"><img class="cover" src="https://images.niaobulashi.com/typecho/uploads/2019/08/3377076316.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-08-30</div><div class="title">性能调优-Mysql索引数据结构详解与索引优化</div></div></a></div><div><a href="/2018/04/22/2018-04-22-linux-mysql-apache-php/" title="Linux搭建mysql、apache、php服务总结"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-04-22</div><div class="title">Linux搭建mysql、apache、php服务总结</div></div></a></div><div><a href="/2018/05/04/2018-05-04-linux-shell/" title="Linux中常用Shell命令"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-04</div><div class="title">Linux中常用Shell命令</div></div></a></div><div><a href="/2018/05/22/2018-05-22-planToSSL/" title="Lets Encrypt证书终于搞定了"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/22222.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-22</div><div class="title">Lets Encrypt证书终于搞定了</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/><div class="author-info__name">鸟不拉诗</div><div class="author-info__description">品味生活，分享技术</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/niaobulashi" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hulang6666@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Explain%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">Explain工具介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#explain%E5%88%97"><span class="toc-number">2.</span> <span class="toc-text">explain列</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81id%E5%88%97"><span class="toc-number">2.0.1.</span> <span class="toc-text">1、id列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81select-type"><span class="toc-number">2.0.2.</span> <span class="toc-text">2、select_type</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81table%E5%88%97"><span class="toc-number">2.0.3.</span> <span class="toc-text">3、table列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81type%E5%88%97"><span class="toc-number">2.0.4.</span> <span class="toc-text">4、type列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5%E3%80%81possible-keys%E5%88%97"><span class="toc-number">2.0.5.</span> <span class="toc-text">5、possible_keys列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6%E3%80%81key%E5%88%97"><span class="toc-number">2.0.6.</span> <span class="toc-text">6、key列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7%E3%80%81key-len%E5%88%97"><span class="toc-number">2.0.7.</span> <span class="toc-text">7、key_len列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#8%E3%80%81ref%E5%88%97"><span class="toc-number">2.0.8.</span> <span class="toc-text">8、ref列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9%E3%80%81rows%E5%88%97"><span class="toc-number">2.0.9.</span> <span class="toc-text">9、rows列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#10%E3%80%81Extra%E5%88%97"><span class="toc-number">2.0.10.</span> <span class="toc-text">10、Extra列</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-filesort%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3"><span class="toc-number">3.</span> <span class="toc-text">Using filesort文件排序原理详解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#filesort%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F%E6%96%B9%E5%BC%8F"><span class="toc-number">3.0.1.</span> <span class="toc-text">filesort文件排序方式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Join%E5%85%B3%E8%81%94%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">Join关联查询优化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF%E8%BF%9E%E6%8E%A5-Nested-Loop-Join-NLJ-%E7%AE%97%E6%B3%95"><span class="toc-number">4.0.1.</span> <span class="toc-text">嵌套循环连接 Nested-Loop Join(NLJ) 算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E5%9D%97%E7%9A%84%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF%E8%BF%9E%E6%8E%A5-Block-Nested-Loop-Join-BNL-%E7%AE%97%E6%B3%95"><span class="toc-number">4.0.2.</span> <span class="toc-text">基于块的嵌套循环连接 Block Nested-Loop Join( BNL )算法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8E%E5%85%B3%E8%81%94sql%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-number">5.</span> <span class="toc-text">对于关联sql的优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">6.</span> <span class="toc-text">索引最佳实践</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询"><img src="https://images.niaobulashi.com/hexo/niaobulashi/2019/wuyi.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="假期余额查询"/></a><div class="content"><a class="title" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询">假期余额查询</a><time datetime="2021-04-30T03:12:10.000Z" title="发表于 2021-04-30 11:12:10">2021-04-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="下班去大雁塔溜达"/></a><div class="content"><a class="title" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达">下班去大雁塔溜达</a><time datetime="2021-04-29T02:24:30.000Z" title="发表于 2021-04-29 10:24:30">2021-04-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="秒杀业务方案思路"/></a><div class="content"><a class="title" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路">秒杀业务方案思路</a><time datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="逛一逛大唐芙蓉园"/></a><div class="content"><a class="title" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园">逛一逛大唐芙蓉园</a><time datetime="2021-04-26T04:40:30.000Z" title="发表于 2021-04-26 12:40:30">2021-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/45461931fa6a4133920f84f7271d262e.jpeg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="我国适龄儿童可免费接种15种疫苗"/></a><div class="content"><a class="title" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗">我国适龄儿童可免费接种15种疫苗</a><time datetime="2021-04-25T03:33:30.000Z" title="发表于 2021-04-25 11:33:30">2021-04-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By 鸟不拉诗</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
-                    
-                      <a class="hover-with-bg" href="/tags/Mysql/">Mysql</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/01/12/2020-01-12-mysql-transaction-mvcc/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Mysql锁、事务隔离级别、MVCC底层原理机制</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2020/01/10/2020-01-10-payment-interface/">
-                        <span class="hidden-mobile">网上支付平台接口使用总结</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.lazyComments('valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
-        new Valine({
-          el: "#valine",
-          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
-          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
-          placeholder: "说点什么~",
-          path: window.location.pathname,
-          avatar: "retro",
-          meta: ["nick","mail","link"],
-          pageSize: "10",
-          lang: "zh-CN",
-          highlight: false,
-          recordIP: false,
-          serverURLs: "",
-        });
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the
-    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
-  </noscript>
+document.addEventListener('DOMContentLoaded', panguInit)</script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
 
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz',
+      appKey: 'WsdLwIB6AC0kk3T7hHhFJPO2',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
 
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
 
-      </div>
-    
-  </div>
-</div>
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
 
-<!-- Custom -->
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
 
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
 
-    
+document.addEventListener('pjax:send', function () {
 
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
+  // removeEventListener toc scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-      <div class="col-lg-7 mx-auto nopadding-x-md">
-        <div class="container custom mx-auto">
-           <script src="/js/sidecar.v1.js" async defer></script> <script> ((window.gitter = {}).chat = {}).options = { room: "niaobulashi/Lobby" }; </script> 
-        </div>
-      </div>
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://niaobulashi.com/atom" target="_blank" rel="nofollow noopener"><span>SSR</span></a> <i class="iconfont icon-love"></i> <a href="https://www.upyun.com/" rel="external nofollow" target="_blank"><img style="vertical-align:middle" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/yun_logo6.png" class="lazyload"></a> 
-  </div>
+  typeof preloader === 'object' && preloader.initLoading()
   
-  <div class="statistics">
-    
-    
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
 
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
+  typeof typed === 'object' && typed.destroy()
 
-    
-  </div>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
 
+})
 
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        鄂ICP备17026246号-1
-      </a>
-    </span>
-    
-  </div>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
-  
-</footer>
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
 
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'G-5VCD453CKL', {'page_path': window.location.pathname});
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
 
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
 
-<!-- Plugins -->
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
 
+  typeof preloader === 'object' && preloader.endLoading()
+})
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-5VCD453CKL', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5VCD453CKL');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

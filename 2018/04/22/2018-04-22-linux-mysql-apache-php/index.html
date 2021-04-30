@@ -1,691 +1,396 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Linux搭建mysql、apache、php服务总结 | 鸟不拉诗</title><meta name="keywords" content="Java,Linux"><meta name="author" content="鸟不拉诗"><meta name="copyright" content="鸟不拉诗"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="阿里云ESC实例配置 对于新手，比如我，了解云服务无非就是阿里云和腾讯云，对于国外的服务器了解甚少。学生时代估计会有很实惠的打折优惠吧，反正我没遇到过（我大学的时候只知道玩，也没关注过这些~）。废话说了这么多，现在开始吧…####实名认证阿里云进行实名认证之后，入口：产品弹性计算云服务器ECS，选择合适的参数配置规格点击购买即可。####查看实例购买成功之后，可以从管理控制台云计算基础服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux搭建mysql、apache、php服务总结">
+<meta property="og:url" content="https://niaobulashi.com/2018/04/22/2018-04-22-linux-mysql-apache-php/index.html">
+<meta property="og:site_name" content="鸟不拉诗">
+<meta property="og:description" content="阿里云ESC实例配置 对于新手，比如我，了解云服务无非就是阿里云和腾讯云，对于国外的服务器了解甚少。学生时代估计会有很实惠的打折优惠吧，反正我没遇到过（我大学的时候只知道玩，也没关注过这些~）。废话说了这么多，现在开始吧…####实名认证阿里云进行实名认证之后，入口：产品弹性计算云服务器ECS，选择合适的参数配置规格点击购买即可。####查看实例购买成功之后，可以从管理控制台云计算基础服务">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif">
+<meta property="article:published_time" content="2018-04-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-30T04:53:55.969Z">
+<meta property="article:author" content="鸟不拉诗">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif"><link rel="shortcut icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico"><link rel="canonical" href="https://niaobulashi.com/2018/04/22/2018-04-22-linux-mysql-apache-php/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google_site_verification" content="G-5VCD453CKL"/><meta name="baidu_site_verification" content="ffb42684ee1a6179af94ba8bc1920e42"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5VCD453CKL');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Linux搭建mysql、apache、php服务总结',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-30 12:53:55'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
 
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
 
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
 
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
-  <meta name="author" content="niaobulashi">
-  <meta name="keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,品味生活，分享技术,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-     <meta name="Keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录,品味生活，分享技术"/> <meta http-equiv="x-ua-compatible" content="IE=edge"> <meta name="mobile-agent" content="format=xhtml;url=https://niaobulashi.com/" /> <meta name="mobile-agent" content="format=html5;url=https://niaobulashi.com/" /> 
-  
-  <title>Linux搭建mysql、apache、php服务总结 - 鸟不拉诗</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/banner/20210426125918.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Linux搭建mysql、apache、php服务总结">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2018-04-22 00:00" pubdate>
-        2018年4月22日 凌晨
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1.7k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      20
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Linux搭建mysql、apache、php服务总结</h1>
-            
-            <div class="markdown-body">
-              <h2 id="阿里云ESC实例配置"><a href="#阿里云ESC实例配置" class="headerlink" title="阿里云ESC实例配置"></a>阿里云ESC实例配置</h2><blockquote>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">鸟不拉诗</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Linux搭建mysql、apache、php服务总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2018-04-21T16:00:00.000Z" title="发表于 2018-04-22 00:00:00">2018-04-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-30T04:53:55.969Z" title="更新于 2021-04-30 12:53:55">2021-04-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Linux搭建mysql、apache、php服务总结"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="阿里云ESC实例配置"><a href="#阿里云ESC实例配置" class="headerlink" title="阿里云ESC实例配置"></a>阿里云ESC实例配置</h2><blockquote>
 <p>对于新手，比如我，了解云服务无非就是阿里云和腾讯云，对于国外的服务器了解甚少。学生时代估计会有很实惠的打折优惠吧，反正我没遇到过（我大学的时候只知道玩，也没关注过这些~）。废话说了这么多，现在开始吧…<br>####实名认证<br>阿里云进行实名认证之后，入口：产品弹性计算云服务器ECS，选择合适的参数配置规格点击购买即可。<br>####查看实例<br>购买成功之后，可以从管理控制台云计算基础服务实例中查看。</p>
 </blockquote>
-<p><img src="/usr/image/article/bashProfile/01/aliyunManage.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<p><img src="/usr/image/article/bashProfile/01/aliyunManage.png" alt="Alt text"></p>
 <h4 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h4><blockquote>
 <p>初始状态下点击更多，重置密码，该密码即为root密码，哦对了，设置完还需要重启，也在更多，点击重启即可，大概需要40秒吧。<br>####SecureCRT登录<br>登陆服务，个人推荐使用SecureCRT进行管理配置开发，键入root密码，好，现在进入Linux命令行的世界啦~</p>
 </blockquote>
 <h2 id="新建用户"><a href="#新建用户" class="headerlink" title="新建用户"></a>新建用户</h2><blockquote>
 <p>Root用户拥有决定的权限，主要用户安全软件服务，修改系统环境属性等，不利于开发使用，所以让我们先给自己新建一个用户吧。<br>####使用Root新建用户<br>下列是root用户下键入的命令行：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># adduser testuser		#创建用户testuser</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># passwd testuser		 #为用户testuser创建密码</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># adduser testuser		#创建用户testuser</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># passwd testuser		 #为用户testuser创建密码</span><br></code></pre></td></tr></table></figure>
 <blockquote>
 <p>此时在/home目录下已经创建了一个用户目录testuser</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># userdel testuser		#删除用户testuser</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rm –rf * testuser	   #删除用户testuser所在的目录</span><br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/addUser.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># userdel testuser		#删除用户testuser</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rm –rf * testuser	   #删除用户testuser所在的目录</span><br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/addUser.png" alt="Alt text"></p>
 <p>注意各种密码要拿个别人看不到的小本本或者云笔记记着哦，找密码什么的最烦了。</p>
 <h2 id="安装MySQL"><a href="#安装MySQL" class="headerlink" title="安装MySQL"></a>安装MySQL</h2><blockquote>
-<p>首先我都是先把数据库搭建好，个人偏爱mysql，navicat进行客户端管理，以下操作在root用户下进行。<br>####下载前准备<br>下载之前先检查是否已经安装过mysql<br><img src="/usr/image/article/bashProfile/01/checkInstallMySQL.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>无输出内容说明系统没有检测到安装过mysql。<br>若检查到存在安装文件，则先卸载，卸载前先停止mysql服务。</p>
+<p>首先我都是先把数据库搭建好，个人偏爱mysql，navicat进行客户端管理，以下操作在root用户下进行。<br>####下载前准备<br>下载之前先检查是否已经安装过mysql<br><img src="/usr/image/article/bashProfile/01/checkInstallMySQL.png" alt="Alt text"><br>无输出内容说明系统没有检测到安装过mysql。<br>若检查到存在安装文件，则先卸载，卸载前先停止mysql服务。</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service mysql status	#查看mysql服务启动状态</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service mysql stop	  #停止mysql服务</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service mysql status	#查看mysql服务启动状态</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service mysql stop	  #停止mysql服务</span><br></code></pre></td></tr></table></figure>
 <blockquote>
 <p>卸载之前的版本</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –qa|grep –i mysql</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –e xxxx[之前安装的版本] --nodeps	#卸载mysql版本</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –qa|grep –i mysql</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –e xxxx[之前安装的版本] --nodeps	#卸载mysql版本</span><br></code></pre></td></tr></table></figure>
 <h4 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h4><blockquote>
 <p>直接使用yum命令下载mysql8.0来进行安装，安装过程会有问题，这里我们需要使用rpm命令先来进行下载。下载路径为：<a target="_blank" rel="noopener" href="http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm">http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm</a><br>在Linux中下载命令为：</p>
 </blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql">[root<span class="hljs-variable">@XXX</span> <span class="hljs-operator">~</span>]# rpm <span class="hljs-operator">-</span>Uvh http:<span class="hljs-operator">/</span><span class="hljs-operator">/</span>dev.mysql.com<span class="hljs-operator">/</span><span class="hljs-keyword">get</span><span class="hljs-operator">/</span>mysql<span class="hljs-operator">-</span>community<span class="hljs-operator">-</span><span class="hljs-keyword">release</span><span class="hljs-operator">-</span>el7<span class="hljs-number">-5.</span>noarch.rpm<br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/downlaodMySQLURL.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs sql">[root<span class="hljs-variable">@XXX</span> <span class="hljs-operator">~</span>]# rpm <span class="hljs-operator">-</span>Uvh http:<span class="hljs-operator">/</span><span class="hljs-operator">/</span>dev.mysql.com<span class="hljs-operator">/</span><span class="hljs-keyword">get</span><span class="hljs-operator">/</span>mysql<span class="hljs-operator">-</span>community<span class="hljs-operator">-</span><span class="hljs-keyword">release</span><span class="hljs-operator">-</span>el7<span class="hljs-number">-5.</span>noarch.rpm<br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/downlaodMySQLURL.png" alt="Alt text"></p>
 <blockquote>
 <p>下载完成之后查看一下都有哪些mysql的文件，使用命令：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># yum repolist enabled | grep <span class="hljs-string">&quot;mysql.*-community.*&quot;</span></span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># yum repolist enabled | grep <span class="hljs-string">&quot;mysql.*-community.*&quot;</span></span><br></code></pre></td></tr></table></figure>
 <blockquote>
-<p>效果如图：<br><img src="/usr/image/article/bashProfile/01/queryMySQLfiles.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>####安装<br>下面就可以使用yum进行安装。输入命令如下：</p>
+<p>效果如图：<br><img src="/usr/image/article/bashProfile/01/queryMySQLfiles.png" alt="Alt text"><br>####安装<br>下面就可以使用yum进行安装。输入命令如下：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># yum install mysql-community-server</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># yum install mysql-community-server</span><br></code></pre></td></tr></table></figure>
 <blockquote>
-<p>效果如图<br><img src="/usr/image/article/bashProfile/01/installMySQL01.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>安装过程中会提示安装一些相关的软件，这里点击”y”回车就可以了，如图：<br><img src="/usr/image/article/bashProfile/01/installMySQL02.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>还有一个文件需要安装，继续点击”y”回车，如图：<br><img src="/usr/image/article/bashProfile/01/installMySQL03.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>这样mysql就安装成功啦。<br>####基础信息配置<br>在配置信息之前，我们先去阿里云实例进行安全组配置，开放3306mysql服务端口。<br><img src="/usr/image/article/bashProfile/01/aliyunManageSecurity.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>不过还没有结束，还需要进行一些配置信息哦。<br>首先将mysql服务启动，开启mysql的进程，使用命令：<br>service mysqld start，效果图如下：<br><img src="/usr/image/article/bashProfile/01/mysqldStart.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>查看mysql服务进程信息，使用命令：<br>service mysqld status，效果图如下：<br><img src="/usr/image/article/bashProfile/01/mysqldStatus.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>Mysql服务启动之后，还选哟一些基本信息的配置。输入设置命令：</p>
+<p>效果如图<br><img src="/usr/image/article/bashProfile/01/installMySQL01.png" alt="Alt text"><br>安装过程中会提示安装一些相关的软件，这里点击”y”回车就可以了，如图：<br><img src="/usr/image/article/bashProfile/01/installMySQL02.png" alt="Alt text"><br>还有一个文件需要安装，继续点击”y”回车，如图：<br><img src="/usr/image/article/bashProfile/01/installMySQL03.png" alt="Alt text"><br>这样mysql就安装成功啦。<br>####基础信息配置<br>在配置信息之前，我们先去阿里云实例进行安全组配置，开放3306mysql服务端口。<br><img src="/usr/image/article/bashProfile/01/aliyunManageSecurity.png" alt="Alt text"><br>不过还没有结束，还需要进行一些配置信息哦。<br>首先将mysql服务启动，开启mysql的进程，使用命令：<br>service mysqld start，效果图如下：<br><img src="/usr/image/article/bashProfile/01/mysqldStart.png" alt="Alt text"><br>查看mysql服务进程信息，使用命令：<br>service mysqld status，效果图如下：<br><img src="/usr/image/article/bashProfile/01/mysqldStatus.png" alt="Alt text"><br>Mysql服务启动之后，还选哟一些基本信息的配置。输入设置命令：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># mysql_secure_installation</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># mysql_secure_installation</span><br></code></pre></td></tr></table></figure>
 <blockquote>
-<p>效果如图：<br><img src="/usr/image/article/bashProfile/01/mysqlSecureInstallation.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>这里需要注意一下：<br>初次安装时，只需要回车即可，如果以前安装过，这里会提示需要输入root密码，键入root密码回车。这点请稍微注意一下。。<br>下列几处需要设置的地方如图：<br><img src="/usr/image/article/bashProfile/01/mysqlSecureInstallationSettings.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>登陆mysql，命令如下：</p>
+<p>效果如图：<br><img src="/usr/image/article/bashProfile/01/mysqlSecureInstallation.png" alt="Alt text"><br>这里需要注意一下：<br>初次安装时，只需要回车即可，如果以前安装过，这里会提示需要输入root密码，键入root密码回车。这点请稍微注意一下。。<br>下列几处需要设置的地方如图：<br><img src="/usr/image/article/bashProfile/01/mysqlSecureInstallationSettings.png" alt="Alt text"><br>登陆mysql，命令如下：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># mysql –u root –p</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># mysql –u root –p</span><br></code></pre></td></tr></table></figure>
 <blockquote>
-<p>输入数据库root的密码回车，如下图：<br><img src="/usr/image/article/bashProfile/01/loginMySQL.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>Mysql就正式安装设置完毕啦，是不是so easy!<br>####Navicat连接数据库<br>很显然命令行方式很不适合开发使用，可视化也不强，个人推荐使用Navicat Premium数据库连接工具连接mysql数据库，方便！<br>输入连接信息，如图下：<br><img src="/usr/image/article/bashProfile/01/checkNavicatLoginMysql.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>点击连接测试，如图下：<br><img src="/usr/image/article/bashProfile/01/mysqlError1130.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>会出现”Host is not allowed to connect to this MySQL server”<br>如何解决这个问题呢？很明显这是不允许远程登录，只能在localhost主机进行登录。所以需要授权，命令方法如下：</p>
+<p>输入数据库root的密码回车，如下图：<br><img src="/usr/image/article/bashProfile/01/loginMySQL.png" alt="Alt text"><br>Mysql就正式安装设置完毕啦，是不是so easy!<br>####Navicat连接数据库<br>很显然命令行方式很不适合开发使用，可视化也不强，个人推荐使用Navicat Premium数据库连接工具连接mysql数据库，方便！<br>输入连接信息，如图下：<br><img src="/usr/image/article/bashProfile/01/checkNavicatLoginMysql.png" alt="Alt text"><br>点击连接测试，如图下：<br><img src="/usr/image/article/bashProfile/01/mysqlError1130.png" alt="Alt text"><br>会出现”Host is not allowed to connect to this MySQL server”<br>如何解决这个问题呢？很明显这是不允许远程登录，只能在localhost主机进行登录。所以需要授权，命令方法如下：</p>
 </blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql">[root<span class="hljs-variable">@XXX</span> <span class="hljs-operator">~</span>]# mysql –u root <span class="hljs-operator">-</span>p<br>Enter password: <br>mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> PRIVILEGES <span class="hljs-keyword">ON</span> <span class="hljs-operator">*</span>.<span class="hljs-operator">*</span> <span class="hljs-keyword">TO</span> <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> <span class="hljs-keyword">WITH</span> <span class="hljs-keyword">GRANT</span> OPTION;<br>mysql<span class="hljs-operator">&gt;</span> FLUSH PRIVILEGES;<br>mysql<span class="hljs-operator">&gt;</span> QUIT;<br></code></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="code"><pre><code class="hljs sql">[root<span class="hljs-variable">@XXX</span> <span class="hljs-operator">~</span>]# mysql –u root <span class="hljs-operator">-</span>p<br>Enter password: <br>mysql<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> PRIVILEGES <span class="hljs-keyword">ON</span> <span class="hljs-operator">*</span>.<span class="hljs-operator">*</span> <span class="hljs-keyword">TO</span> <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> <span class="hljs-keyword">WITH</span> <span class="hljs-keyword">GRANT</span> OPTION;<br>mysql<span class="hljs-operator">&gt;</span> FLUSH PRIVILEGES;<br>mysql<span class="hljs-operator">&gt;</span> QUIT;<br></code></pre></td></tr></table></figure>
 <blockquote>
-<p>如下图所示：<br><img src="/usr/image/article/bashProfile/01/solveMysqlError1130.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>回来再点击“连接测试”，会出现下图报错：<br><img src="/usr/image/article/bashProfile/01/mysqlError1045.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>不着急，现在就解决这个问题。<br>在SecureCRT中登录mysql，查询mysql.user表信息，将密码为空的数据删除掉即可，删除空账号和空密码的数据，命令如下：</p>
+<p>如下图所示：<br><img src="/usr/image/article/bashProfile/01/solveMysqlError1130.png" alt="Alt text"><br>回来再点击“连接测试”，会出现下图报错：<br><img src="/usr/image/article/bashProfile/01/mysqlError1045.png" alt="Alt text"><br>不着急，现在就解决这个问题。<br>在SecureCRT中登录mysql，查询mysql.user表信息，将密码为空的数据删除掉即可，删除空账号和空密码的数据，命令如下：</p>
 </blockquote>
-<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs n1ql">[root@XXX ~]# mysql –u root –p<br>Enter password: <br>mysql&gt; use mysql;<br>mysql&gt; <span class="hljs-keyword">select</span> Host,<span class="hljs-keyword">User</span>,<span class="hljs-keyword">Password</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span>;<br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/selectMysqlUser.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight n1ql"><table><tr><td class="code"><pre><code class="hljs n1ql">[root@XXX ~]# mysql –u root –p<br>Enter password: <br>mysql&gt; use mysql;<br>mysql&gt; <span class="hljs-keyword">select</span> Host,<span class="hljs-keyword">User</span>,<span class="hljs-keyword">Password</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">user</span>;<br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/selectMysqlUser.png" alt="Alt text"></p>
 <blockquote>
-<p>删除User和Password为空的数据，放心，可以删的，命令如下：<br>delete from mysql.user where Password=’’;<br>在刚刚的mysql_secure_installation中我们已经配置了root的登录密码，在这里我们也还可以设置root密码，命令如下：<br>Update mysql.user set password=password(‘root密码’) where Host=’%’;<br>最后请一定要做的操作是：刷新权限<br>Flush privileges;<br>退出：quit;<br>再回来连接测试，如下图：<br><img src="/usr/image/article/bashProfile/01/checkNavicatLoginMysqlSuccess.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>Mysql现在是彻底弄好啦。请尽情的增删改查吧骚年~<br>####解决中文乱码<br>进入目录</p>
+<p>删除User和Password为空的数据，放心，可以删的，命令如下：<br>delete from mysql.user where Password=’’;<br>在刚刚的mysql_secure_installation中我们已经配置了root的登录密码，在这里我们也还可以设置root密码，命令如下：<br>Update mysql.user set password=password(‘root密码’) where Host=’%’;<br>最后请一定要做的操作是：刷新权限<br>Flush privileges;<br>退出：quit;<br>再回来连接测试，如下图：<br><img src="/usr/image/article/bashProfile/01/checkNavicatLoginMysqlSuccess.png" alt="Alt text"><br>Mysql现在是彻底弄好啦。请尽情的增删改查吧骚年~<br>####解决中文乱码<br>进入目录</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># cd /usr/share/mysql</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># vi my-default.cnf</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># cd /usr/share/mysql</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># vi my-default.cnf</span><br></code></pre></td></tr></table></figure>
 <blockquote>
-<p>添加如下配置信息：<br><img src="/usr/image/article/bashProfile/01/mysqlUTF8.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>重启mysql服务</p>
+<p>添加如下配置信息：<br><img src="/usr/image/article/bashProfile/01/mysqlUTF8.png" alt="Alt text"><br>重启mysql服务</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service mysqld restart</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service mysqld restart</span><br></code></pre></td></tr></table></figure>
 <p>##安装Apache<br>####检查、删除、安装</p>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –qa|grep httpd     #检查是否安装apache</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –e 包名 –nodeps    #若有则删除</span><br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/checkInstallApache.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># yum install httpd	 #安装，根据提示，输入Y即可</span><br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/installApache01.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –qa|grep httpd     #检查是否安装apache</span><br>[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># rpm –e 包名 –nodeps    #若有则删除</span><br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/checkInstallApache.png" alt="Alt text"></p>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># yum install httpd	 #安装，根据提示，输入Y即可</span><br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/installApache01.png" alt="Alt text"></p>
 <blockquote>
-<p>需要确认安装一些组件，输入Y即可：<br><img src="/usr/image/article/bashProfile/01/installApache02.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>####启动、测试<br>启动命令如下：</p>
+<p>需要确认安装一些组件，输入Y即可：<br><img src="/usr/image/article/bashProfile/01/installApache02.png" alt="Alt text"><br>####启动、测试<br>启动命令如下：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service httpd start</span><br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/httpdStart.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># service httpd start</span><br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/httpdStart.png" alt="Alt text"></p>
 <blockquote>
 <p>查看apache服务停启情况如下：</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># Service httpd status</span><br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/httpdStatus.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta"># Service httpd status</span><br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/httpdStatus.png" alt="Alt text"></p>
 <blockquote>
-<p>此时需要注意一点的是，安全组规则需要添加端口80的安全组：<br><img src="/usr/image/article/bashProfile/01/aliyunManageSecurity01.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>在浏览器中输入服ip，如下表示apache安装成功：<br><img src="/usr/image/article/bashProfile/01/httpdTest.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>##安装PHP<br>####安装PHP</p>
+<p>此时需要注意一点的是，安全组规则需要添加端口80的安全组：<br><img src="/usr/image/article/bashProfile/01/aliyunManageSecurity01.png" alt="Alt text"><br>在浏览器中输入服ip，如下表示apache安装成功：<br><img src="/usr/image/article/bashProfile/01/httpdTest.png" alt="Alt text"><br>##安装PHP<br>####安装PHP</p>
 </blockquote>
-<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta">#yum install php</span><br></code></pre></td></tr></table></figure>
-<p><img src="/usr/image/article/bashProfile/01/installPHP01.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight autoit"><table><tr><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@XXX</span> ~]<span class="hljs-meta">#yum install php</span><br></code></pre></td></tr></table></figure>
+<p><img src="/usr/image/article/bashProfile/01/installPHP01.png" alt="Alt text"></p>
 <blockquote>
-<p>输入”y”回车<br><img src="/usr/image/article/bashProfile/01/installPHP02.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"><br>安装成功<br>安装组件，支持mysql</p>
+<p>输入”y”回车<br><img src="/usr/image/article/bashProfile/01/installPHP02.png" alt="Alt text"><br>安装成功<br>安装组件，支持mysql</p>
 </blockquote>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">yum install php-mysql php-gd libjpeg* php-imap php-ldap php-odbc php-pear php-<span class="hljs-keyword">xml</span> <span class="hljs-title">php-xmlrpc</span> php-mbstring php-mcrypt php-bcmath php-mhash libmcrypt<br></code></pre></td></tr></table></figure>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><code class="hljs crmsh">yum install php-mysql php-gd libjpeg* php-imap php-ldap php-odbc php-pear php-<span class="hljs-keyword">xml</span> <span class="hljs-title">php-xmlrpc</span> php-mbstring php-mcrypt php-bcmath php-mhash libmcrypt<br></code></pre></td></tr></table></figure>
 <blockquote>
 <p>根据提示，输入Y即可<br>####启动HTTPD<br>重启httpd</p>
 </blockquote>
-<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">service httpd restart</span><br></code></pre></td></tr></table></figure>
-<p>在浏览器中访问ip<br><img src="/usr/image/article/bashProfile/01/phpTest.png" srcset="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif" lazyload alt="Alt text"></p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">service httpd restart</span><br></code></pre></td></tr></table></figure>
+<p>在浏览器中访问ip<br><img src="/usr/image/article/bashProfile/01/phpTest.png" alt="Alt text"></p>
 <blockquote>
 <p>OK啦<br>##参考文章<br>[0]<a target="_blank" rel="noopener" href="https://www.cnblogs.com/zhaoxd07/p/5580126.html">【PHP】linux搭建PHP运行环境</a></p>
 </blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">鸟不拉诗</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://niaobulashi.com/2018/04/22/2018-04-22-linux-mysql-apache-php/">https://niaobulashi.com/2018/04/22/2018-04-22-linux-mysql-apache-php/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://niaobulashi.com" target="_blank">鸟不拉诗</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Linux/">Linux</a></div><div class="post_share"><div class="social-share" data-image="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2018/05/04/2018-05-04-linux-shell/"><img class="prev-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Linux中常用Shell命令</div></div></a></div><div class="next-post pull-right"><a href="/2017/12/22/2017-12-22-enrich/"><img class="next-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2017/充实.jfif" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">真的很充实。。</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2018/05/04/2018-05-04-linux-shell/" title="Linux中常用Shell命令"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/e69bf98eff41c0f5b6594c0eb79098ae.jfif" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-04</div><div class="title">Linux中常用Shell命令</div></div></a></div><div><a href="/2020/01/13/2020-01-13-linux-mutli-tomcat/" title="linux 同时启动多个tomcat"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2020/u=1397363100,4264619668&fm=26&fmt=auto&gp=0.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-13</div><div class="title">linux 同时启动多个tomcat</div></div></a></div><div><a href="/2018/05/07/2018-05-07-mysql-question/" title="mysql数据库开发常见问题及优化"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/897247-20160625162831875-891132194.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-07</div><div class="title">mysql数据库开发常见问题及优化</div></div></a></div><div><a href="/2018/05/22/2018-05-22-planToSSL/" title="Lets Encrypt证书终于搞定了"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/22222.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-22</div><div class="title">Lets Encrypt证书终于搞定了</div></div></a></div><div><a href="/2018/05/29/2018-05-29-ssl/" title="网站安装SSL证书"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/0c11aec38ad148dc9ce6c2abc8825b4a.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-29</div><div class="title">网站安装SSL证书</div></div></a></div><div><a href="/2018/05/30/2018-05-30-exception/" title="谈谈你对Java异常处理机制的理解？"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2018/20200809111855958.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2018-05-30</div><div class="title">谈谈你对Java异常处理机制的理解？</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/><div class="author-info__name">鸟不拉诗</div><div class="author-info__description">品味生活，分享技术</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/niaobulashi" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hulang6666@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%BF%E9%87%8C%E4%BA%91ESC%E5%AE%9E%E4%BE%8B%E9%85%8D%E7%BD%AE"><span class="toc-number">1.</span> <span class="toc-text">阿里云ESC实例配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%87%8D%E5%90%AF"><span class="toc-number">1.0.1.</span> <span class="toc-text">重启</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E5%BB%BA%E7%94%A8%E6%88%B7"><span class="toc-number">2.</span> <span class="toc-text">新建用户</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85MySQL"><span class="toc-number">3.</span> <span class="toc-text">安装MySQL</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD"><span class="toc-number">3.0.1.</span> <span class="toc-text">下载</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询"><img src="https://images.niaobulashi.com/hexo/niaobulashi/2019/wuyi.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="假期余额查询"/></a><div class="content"><a class="title" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询">假期余额查询</a><time datetime="2021-04-30T03:12:10.000Z" title="发表于 2021-04-30 11:12:10">2021-04-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="下班去大雁塔溜达"/></a><div class="content"><a class="title" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达">下班去大雁塔溜达</a><time datetime="2021-04-29T02:24:30.000Z" title="发表于 2021-04-29 10:24:30">2021-04-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="秒杀业务方案思路"/></a><div class="content"><a class="title" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路">秒杀业务方案思路</a><time datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="逛一逛大唐芙蓉园"/></a><div class="content"><a class="title" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园">逛一逛大唐芙蓉园</a><time datetime="2021-04-26T04:40:30.000Z" title="发表于 2021-04-26 12:40:30">2021-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/45461931fa6a4133920f84f7271d262e.jpeg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="我国适龄儿童可免费接种15种疫苗"/></a><div class="content"><a class="title" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗">我国适龄儿童可免费接种15种疫苗</a><time datetime="2021-04-25T03:33:30.000Z" title="发表于 2021-04-25 11:33:30">2021-04-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By 鸟不拉诗</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/">工作笔记</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
-                    
-                      <a class="hover-with-bg" href="/tags/Linux/">Linux</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2018/05/04/2018-05-04-linux-shell/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Linux中常用Shell命令</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2017/12/22/2017-12-22-enrich/">
-                        <span class="hidden-mobile">真的很充实。。</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.lazyComments('valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
-        new Valine({
-          el: "#valine",
-          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
-          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
-          placeholder: "说点什么~",
-          path: window.location.pathname,
-          avatar: "retro",
-          meta: ["nick","mail","link"],
-          pageSize: "10",
-          lang: "zh-CN",
-          highlight: false,
-          recordIP: false,
-          serverURLs: "",
-        });
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the
-    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
-  </noscript>
+document.addEventListener('DOMContentLoaded', panguInit)</script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
 
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz',
+      appKey: 'WsdLwIB6AC0kk3T7hHhFJPO2',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
 
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
 
-      </div>
-    
-  </div>
-</div>
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
 
-<!-- Custom -->
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
 
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
 
-    
+document.addEventListener('pjax:send', function () {
 
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
+  // removeEventListener toc scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-      <div class="col-lg-7 mx-auto nopadding-x-md">
-        <div class="container custom mx-auto">
-           <script src="/js/sidecar.v1.js" async defer></script> <script> ((window.gitter = {}).chat = {}).options = { room: "niaobulashi/Lobby" }; </script> 
-        </div>
-      </div>
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://niaobulashi.com/atom" target="_blank" rel="nofollow noopener"><span>SSR</span></a> <i class="iconfont icon-love"></i> <a href="https://www.upyun.com/" rel="external nofollow" target="_blank"><img style="vertical-align:middle" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/yun_logo6.png" class="lazyload"></a> 
-  </div>
+  typeof preloader === 'object' && preloader.initLoading()
   
-  <div class="statistics">
-    
-    
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
 
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
+  typeof typed === 'object' && typed.destroy()
 
-    
-  </div>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
 
+})
 
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        鄂ICP备17026246号-1
-      </a>
-    </span>
-    
-  </div>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
-  
-</footer>
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
 
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'G-5VCD453CKL', {'page_path': window.location.pathname});
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
 
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
 
-<!-- Plugins -->
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
 
+  typeof preloader === 'object' && preloader.endLoading()
+})
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-5VCD453CKL', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5VCD453CKL');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,291 +1,190 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spring Boot2(九)：整合Jpa的基本使用 | 鸟不拉诗</title><meta name="keywords" content="SpringBoot"><meta name="author" content="鸟不拉诗"><meta name="copyright" content="鸟不拉诗"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="今天早上看到一篇微信文章，说的是国内普遍用的Mybatis，而国外确普遍用的是Jpa。我之前也看了jpa，发现入门相当容易。jpa对于简单的CRUD支持非常好，开发效率也会比Mybatis高出不少，因为JpaRepository会根据你定制的实体类，继承了JpaRepository会有一套完整的封装好了的基本条件方法。减少了很多开发量。你只需要写SQL就行了。可能我才刚入门Jpa，对一些认识还是很">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot2(九)：整合Jpa的基本使用">
+<meta property="og:url" content="https://niaobulashi.com/2019/07/07/2019-07-07-springboot-jpa/index.html">
+<meta property="og:site_name" content="鸟不拉诗">
+<meta property="og:description" content="今天早上看到一篇微信文章，说的是国内普遍用的Mybatis，而国外确普遍用的是Jpa。我之前也看了jpa，发现入门相当容易。jpa对于简单的CRUD支持非常好，开发效率也会比Mybatis高出不少，因为JpaRepository会根据你定制的实体类，继承了JpaRepository会有一套完整的封装好了的基本条件方法。减少了很多开发量。你只需要写SQL就行了。可能我才刚入门Jpa，对一些认识还是很">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images.niaobulashi.com/hexo/niaobulashi/2019/jpa.jpeg">
+<meta property="article:published_time" content="2019-07-07T04:22:11.000Z">
+<meta property="article:modified_time" content="2021-04-30T02:54:59.680Z">
+<meta property="article:author" content="鸟不拉诗">
+<meta property="article:tag" content="SpringBoot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.niaobulashi.com/hexo/niaobulashi/2019/jpa.jpeg"><link rel="shortcut icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico"><link rel="canonical" href="https://niaobulashi.com/2019/07/07/2019-07-07-springboot-jpa/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//hm.baidu.com"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta name="google_site_verification" content="G-5VCD453CKL"/><meta name="baidu_site_verification" content="ffb42684ee1a6179af94ba8bc1920e42"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><script>var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-5VCD453CKL');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#121212","position":"bottom-left"},
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Spring Boot2(九)：整合Jpa的基本使用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-30 10:54:59'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
 
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
 
-<!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
 
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
 
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <link rel="icon" href="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="人生有几个十年呢？点点滴滴，用文字记录">
-  <meta name="author" content="niaobulashi">
-  <meta name="keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,品味生活，分享技术,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-     <meta name="Keywords" content="个人博客,鸟不拉诗,鸟不拉屎,Java,后端开发,游戏爱好者,喜好健身,南屿北岛,长江大学,人生有几个十年呢？点点滴滴，用文字记录,品味生活，分享技术"/> <meta http-equiv="x-ua-compatible" content="IE=edge"> <meta name="mobile-agent" content="format=xhtml;url=https://niaobulashi.com/" /> <meta name="mobile-agent" content="format=html5;url=https://niaobulashi.com/" /> 
-  
-  <title>Spring Boot2(九)：整合Jpa的基本使用 - 鸟不拉诗</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
-
-
-
-<!-- 主题依赖的图标库，不要自行修改 -->
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
-
-
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"niaobulashi.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"ffb42684ee1a6179af94ba8bc1920e42","google":"G-5VCD453CKL","gtag":"G-5VCD453CKL","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz","app_key":"WsdLwIB6AC0kk3T7hHhFJPO2","server_url":null}}};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@1.1.1/dist/echarts-gl.min.js"></script>
-<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
-</head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>鸟不拉诗</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/">
-                <i class="iconfont icon-category-fill"></i>
-                分类
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" href="javascript:">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://images.niaobulashi.com/hexo/niaobulashi/banner/20210426125918.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Spring Boot2(九)：整合Jpa的基本使用">
-              
-            </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-07-07 00:00" pubdate>
-        2019年7月7日 凌晨
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      2k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      30
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Spring Boot2(九)：整合Jpa的基本使用</h1>
-            
-            <div class="markdown-body">
-              <p>今天早上看到一篇微信文章，说的是国内普遍用的Mybatis，而国外确普遍用的是Jpa。我之前也看了jpa，发现入门相当容易。jpa对于简单的CRUD支持非常好，开发效率也会比Mybatis高出不少，因为<code>JpaRepository</code>会根据你定制的实体类，继承了<code>JpaRepository</code>会有一套完整的封装好了的基本条件方法。减少了很多开发量。你只需要写SQL就行了。可能我才刚入门Jpa，对一些认识还是很浅显。我觉得Jpa对于多表查询，开发起来有点吃力。。</p>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="鸟不拉诗" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">鸟不拉诗</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Spring Boot2(九)：整合Jpa的基本使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2019-07-07T04:22:11.000Z" title="发表于 2019-07-07 12:22:11">2019-07-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-30T02:54:59.680Z" title="更新于 2021-04-30 10:54:59">2021-04-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>9分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Spring Boot2(九)：整合Jpa的基本使用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><p>今天早上看到一篇微信文章，说的是国内普遍用的Mybatis，而国外确普遍用的是Jpa。我之前也看了jpa，发现入门相当容易。jpa对于简单的CRUD支持非常好，开发效率也会比Mybatis高出不少，因为<code>JpaRepository</code>会根据你定制的实体类，继承了<code>JpaRepository</code>会有一套完整的封装好了的基本条件方法。减少了很多开发量。你只需要写SQL就行了。可能我才刚入门Jpa，对一些认识还是很浅显。我觉得Jpa对于多表查询，开发起来有点吃力。。</p>
 <p>这是我开始玩Jpa的最初的感受，但是Jpa却受到了极大的支持和赞扬，在国外Jpa远比Mybatis流行得多得多。国内却还是在流程用Mybatis，估计也是收到很多培训机构或者大V的带领下，很多国内优秀的开源项目也是用的Mybatis，因为已经用得非常熟练了。</p>
 <p>话不多说，先看看SpringBoot如何整合使用Jpa吧！</p>
 <p>这里具体讲一讲Jpa的搭建，几种常见的场景的使用：增删改查、多表查询，非主键查询这几种情况的一个学习总结。</p>
-<h2 id="一、代码部署"><a href="#一、代码部署" class="headerlink" title="一、代码部署"></a>一、代码部署</h2><h3 id="1、添加Maven依赖"><a href="#1、添加Maven依赖" class="headerlink" title="1、添加Maven依赖"></a>1、添加Maven依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-devtools<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>runtime<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">optional</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">optional</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.projectlombok<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>lombok<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">optional</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">optional</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-data-jpa<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>mysql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mysql-connector-java<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>runtime<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<h2 id="一、代码部署"><a href="#一、代码部署" class="headerlink" title="一、代码部署"></a>一、代码部署</h2><h3 id="1、添加Maven依赖"><a href="#1、添加Maven依赖" class="headerlink" title="1、添加Maven依赖"></a>1、添加Maven依赖</h3><figure class="highlight xml"><table><tr><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-devtools<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>runtime<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">optional</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">optional</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.projectlombok<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>lombok<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">optional</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">optional</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>test<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.boot<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-boot-starter-data-jpa<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>mysql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mysql-connector-java<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>runtime<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>其实Jpa关键用到的是最下面两块</p>
 <h3 id="2、配置application"><a href="#2、配置application" class="headerlink" title="2、配置application"></a>2、配置application</h3><p><code>application.yml</code></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">8081</span><br><span class="hljs-comment">#指定配置文件为test</span><br><span class="hljs-attr">spring:</span><br>  <span class="hljs-attr">profiles:</span><br>    <span class="hljs-attr">active:</span> <span class="hljs-string">test</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span><br>  <span class="hljs-attr">port:</span> <span class="hljs-number">8081</span><br><span class="hljs-comment">#指定配置文件为test</span><br><span class="hljs-attr">spring:</span><br>  <span class="hljs-attr">profiles:</span><br>    <span class="hljs-attr">active:</span> <span class="hljs-string">test</span><br></code></pre></td></tr></table></figure>
 
 <p><code>application-test.yml</code></p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">spring:</span><br>  <span class="hljs-attr">datasource:</span><br>    <span class="hljs-attr">driver-class-name:</span> <span class="hljs-string">com.mysql.cj.jdbc.Driver</span><br>    <span class="hljs-attr">url:</span> <span class="hljs-string">jdbc:mysql://127.0.0.1:3306/jpatest?serverTimezone=UTC&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=true</span><br>    <span class="hljs-attr">username:</span> <span class="hljs-string">root</span><br>    <span class="hljs-attr">password:</span> <span class="hljs-string">root</span><br>  <span class="hljs-attr">jpa:</span><br>    <span class="hljs-comment"># 数据库类型</span><br>    <span class="hljs-attr">database:</span> <span class="hljs-string">mysql</span><br>    <span class="hljs-comment">#打印SQL</span><br>    <span class="hljs-attr">show-sql:</span> <span class="hljs-literal">true</span><br>    <span class="hljs-attr">hibernate:</span><br>      <span class="hljs-attr">ddl-auto:</span> <span class="hljs-string">update</span>  <span class="hljs-comment">#第一次启动创建表，之后修改为update</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">spring:</span><br>  <span class="hljs-attr">datasource:</span><br>    <span class="hljs-attr">driver-class-name:</span> <span class="hljs-string">com.mysql.cj.jdbc.Driver</span><br>    <span class="hljs-attr">url:</span> <span class="hljs-string">jdbc:mysql://127.0.0.1:3306/jpatest?serverTimezone=UTC&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=true</span><br>    <span class="hljs-attr">username:</span> <span class="hljs-string">root</span><br>    <span class="hljs-attr">password:</span> <span class="hljs-string">root</span><br>  <span class="hljs-attr">jpa:</span><br>    <span class="hljs-comment"># 数据库类型</span><br>    <span class="hljs-attr">database:</span> <span class="hljs-string">mysql</span><br>    <span class="hljs-comment">#打印SQL</span><br>    <span class="hljs-attr">show-sql:</span> <span class="hljs-literal">true</span><br>    <span class="hljs-attr">hibernate:</span><br>      <span class="hljs-attr">ddl-auto:</span> <span class="hljs-string">update</span>  <span class="hljs-comment">#第一次启动创建表，之后修改为update</span><br></code></pre></td></tr></table></figure>
 
 <p><code>application-test.yml</code>需要了解的是jpa分支，如果需要通过jpa在数据库中建表，就将<code>spring.jpa.hibernate.ddl-auto</code>改为<code>create</code>，建完表之后，建议改为update，否则你再次重启，表会回炉重造，数据相应的会丢失。可得注意啦。</p>
 <h3 id="3、创建实体类"><a href="#3、创建实体类" class="headerlink" title="3、创建实体类"></a>3、创建实体类</h3><p>用户表sys_user的实体类</p>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@Data</span><br><span class="hljs-variable">@Entity</span><br><span class="hljs-variable">@Table</span>(name = <span class="hljs-string">&quot;sys_user&quot;</span>)<br>public class SysUser implements Serializable &#123;<br><br>    <span class="hljs-variable">@Id</span><br>    private String userId;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false)<br>    private String userName;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false)<br>    private String passWord;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false, unique = true)<br>    private String email;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false, unique = true)<br>    private String salt;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false)<br>    private Date regTime;<br>    <br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight less"><table><tr><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@Data</span><br><span class="hljs-variable">@Entity</span><br><span class="hljs-variable">@Table</span>(name = <span class="hljs-string">&quot;sys_user&quot;</span>)<br>public class SysUser implements Serializable &#123;<br><br>    <span class="hljs-variable">@Id</span><br>    private String userId;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false)<br>    private String userName;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false)<br>    private String passWord;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false, unique = true)<br>    private String email;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false, unique = true)<br>    private String salt;<br><br>    <span class="hljs-variable">@Column</span>(nullable = false)<br>    private Date regTime;<br>    <br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>用户角色对照表sys_user_role的实体类</p>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@Entity</span><br><span class="hljs-variable">@Data</span><br><span class="hljs-variable">@Table</span>(name = <span class="hljs-string">&quot;sys_user_role&quot;</span>)<br>public class SysUserRole implements Serializable &#123;<br><br>    <span class="hljs-variable">@Id</span><br>    <span class="hljs-variable">@GeneratedValue</span><br>    private int id;<br><br>    <span class="hljs-comment">// 用户ID</span><br>    <span class="hljs-selector-tag">private</span> <span class="hljs-selector-tag">String</span> <span class="hljs-selector-tag">userId</span>;<br><br>    <span class="hljs-comment">// 角色ID</span><br>    <span class="hljs-selector-tag">private</span> <span class="hljs-selector-tag">int</span> <span class="hljs-selector-tag">roleId</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight less"><table><tr><td class="code"><pre><code class="hljs less"><span class="hljs-variable">@Entity</span><br><span class="hljs-variable">@Data</span><br><span class="hljs-variable">@Table</span>(name = <span class="hljs-string">&quot;sys_user_role&quot;</span>)<br>public class SysUserRole implements Serializable &#123;<br><br>    <span class="hljs-variable">@Id</span><br>    <span class="hljs-variable">@GeneratedValue</span><br>    private int id;<br><br>    <span class="hljs-comment">// 用户ID</span><br>    <span class="hljs-selector-tag">private</span> <span class="hljs-selector-tag">String</span> <span class="hljs-selector-tag">userId</span>;<br><br>    <span class="hljs-comment">// 角色ID</span><br>    <span class="hljs-selector-tag">private</span> <span class="hljs-selector-tag">int</span> <span class="hljs-selector-tag">roleId</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="4、Dao层"><a href="#4、Dao层" class="headerlink" title="4、Dao层"></a>4、Dao层</h3><p>用户表SysUserDao</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-symbol">SysUserDao</span> <span class="hljs-symbol">extends</span> <span class="hljs-symbol">JpaRepository</span>&lt;<span class="hljs-symbol">SysUser</span>, <span class="hljs-symbol">Integer</span>&gt; &#123;<br>    <br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-symbol">SysUserDao</span> <span class="hljs-symbol">extends</span> <span class="hljs-symbol">JpaRepository</span>&lt;<span class="hljs-symbol">SysUser</span>, <span class="hljs-symbol">Integer</span>&gt; &#123;<br>    <br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>用户角色对照表SysUserRoleDao</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-symbol">SysUserRoleDao</span> <span class="hljs-symbol">extends</span> <span class="hljs-symbol">JpaRepository</span>&lt;<span class="hljs-symbol">SysUserRole</span>, <span class="hljs-symbol">Integer</span>&gt; &#123;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><code class="hljs angelscript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-symbol">SysUserRoleDao</span> <span class="hljs-symbol">extends</span> <span class="hljs-symbol">JpaRepository</span>&lt;<span class="hljs-symbol">SysUserRole</span>, <span class="hljs-symbol">Integer</span>&gt; &#123;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<h3 id="5、Controller层"><a href="#5、Controller层" class="headerlink" title="5、Controller层"></a>5、Controller层</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequestMapping</span>(<span class="hljs-string">&quot;/user&quot;</span>)<br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserController</span> </span>&#123;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> SysUserDao sysUserDao;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> SysUserRoleDao sysUserRoleDao;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 用户表sys_user，用户角色对照表sys_user_role。数据初始化</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">//发送get请求进行数据添加：127.0.0.1:8081/user/init</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/init&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">initData</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">for</span> (int i = <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">6</span>; i++) &#123;<br>            <span class="hljs-comment">// 根据时间戳生成userId</span><br>            <span class="hljs-built_in">String</span> userId = <span class="hljs-built_in">String</span>.valueOf(System.currentTimeMillis());<br>            <span class="hljs-comment">// new出用户表和用户角色表的对象</span><br>            SysUser sysUser = <span class="hljs-keyword">new</span> SysUser();<br>            SysUserRole sysUserRole = <span class="hljs-keyword">new</span> SysUserRole();<br>            <span class="hljs-comment">// 新增用户表</span><br>            sysUser.setUserId(userId);<br>            sysUser.setUserName(<span class="hljs-string">&quot;username_num&quot;</span> + i);<br>            sysUser.setPassWord(<span class="hljs-string">&quot;password_num&quot;</span> + i);<br>            sysUser.setEmail(<span class="hljs-string">&quot;email_num&quot;</span> + i + <span class="hljs-string">&quot;@qq.com&quot;</span>);<br>            sysUser.setSalt(i + <span class="hljs-string">&quot;&quot;</span>);<br>            sysUser.setRegTime(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>());<br>            sysUserDao.save(sysUser);<br><br>            <span class="hljs-comment">// 暂时规定小于3的，角色为1，新建用户角色表</span><br>            <span class="hljs-keyword">if</span> (i &lt; <span class="hljs-number">3</span>) &#123;<br>                sysUserRole.setId(i);<br>                sysUserRole.setUserId(userId);<br>                sysUserRole.setRoleId(<span class="hljs-number">1</span>);<br>                sysUserRoleDao.save(sysUserRole);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 大于3的，角色为2</span><br>                sysUserRole.setId(i);<br>                sysUserRole.setUserId(userId);<br>                sysUserRole.setRoleId(<span class="hljs-number">2</span>);<br>                sysUserRoleDao.save(sysUserRole);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;init data success&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 删除</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送get请求：127.0.0.1:8081/user/delete/1562486017644</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/delete/&#123;userId&#125;&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">deleteUser</span>(<span class="hljs-params"><span class="hljs-meta">@PathVariable</span>(<span class="hljs-string">&quot;userId&quot;</span>) <span class="hljs-built_in">String</span> userId</span>)</span> &#123;<br>        sysUserDao.deleteByUserId(userId);<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;delete success&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 查询全部</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送get请求：127.0.0.1:8081/user/list</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/list&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> List&lt;SysUser&gt; <span class="hljs-function"><span class="hljs-title">getUsers</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findAll();<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据id查询</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送get请求：127.0.0.1:8081/user/info/1562486017644</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/info/&#123;userId&#125;&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> Optional&lt;SysUser&gt; <span class="hljs-function"><span class="hljs-title">getUserById</span>(<span class="hljs-params"><span class="hljs-meta">@PathVariable</span>(<span class="hljs-string">&quot;userId&quot;</span>) <span class="hljs-built_in">String</span> userId</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findByUserId(userId);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 更新</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送post请求：127.0.0.1:8081/user/update</span><br>    <span class="hljs-comment">// 发送报文体如下</span><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">     &#123;</span><br><span class="hljs-comment">        &quot;userId&quot;:&quot;1562486017551&quot;,</span><br><span class="hljs-comment">        &quot;passWord&quot;: &quot;231231231212312&quot;,</span><br><span class="hljs-comment">        &quot;userName&quot;:&quot;Tom&quot;,</span><br><span class="hljs-comment">        &quot;email&quot;: &quot;1111111@qq.com&quot;</span><br><span class="hljs-comment">     &#125;</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/update&quot;</span>, method = RequestMethod.POST)<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">updateAccount</span>(<span class="hljs-params"><span class="hljs-meta">@RequestBody</span> HashMap&lt;<span class="hljs-built_in">String</span>, <span class="hljs-built_in">String</span>&gt; map</span>)</span> &#123;<br>        <span class="hljs-comment">// 根据Id更新用户信息</span><br>        sysUserDao.updateOne(<br>                map.get(<span class="hljs-string">&quot;email&quot;</span>),<br>                map.get(<span class="hljs-string">&quot;userName&quot;</span>),<br>                map.get(<span class="hljs-string">&quot;passWord&quot;</span>),<br>                map.get(<span class="hljs-string">&quot;userId&quot;</span>));<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;update success&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 关联查询用户的角色信息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送post请求：127.0.0.1:8081/user/getUserRole</span><br>    <span class="hljs-comment">// 发送报文体如下</span><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      &#123;</span><br><span class="hljs-comment">         &quot;userId&quot;:&quot;1562486017629&quot;</span><br><span class="hljs-comment">      &#125;</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/getUserRole&quot;</span>, method = RequestMethod.POST)<br>    <span class="hljs-keyword">public</span> List&lt;SysUserInfo&gt; <span class="hljs-function"><span class="hljs-title">getUserRole</span>(<span class="hljs-params"><span class="hljs-meta">@RequestBody</span> HashMap&lt;<span class="hljs-built_in">String</span>, <span class="hljs-built_in">String</span>&gt; map</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findUserRole(map.get(<span class="hljs-string">&quot;userId&quot;</span>));<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据非主键username模糊查询</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送post请求：127.0.0.1:8081/user/getUserByUserName</span><br>    <span class="hljs-comment">// 发送报文体如下</span><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">    &#123;</span><br><span class="hljs-comment">        &quot;userName&quot;:&quot;username&quot;</span><br><span class="hljs-comment">    &#125;</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/getUserByUserName&quot;</span>, method = RequestMethod.POST)<br>    <span class="hljs-keyword">public</span> List&lt;SysUser&gt; <span class="hljs-function"><span class="hljs-title">getUserByUserName</span>(<span class="hljs-params"><span class="hljs-meta">@RequestBody</span> HashMap&lt;<span class="hljs-built_in">String</span>, <span class="hljs-built_in">String</span>&gt; map</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findUserName(map.get(<span class="hljs-string">&quot;userName&quot;</span>));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="5、Controller层"><a href="#5、Controller层" class="headerlink" title="5、Controller层"></a>5、Controller层</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@RestController</span><br><span class="hljs-meta">@RequestMapping</span>(<span class="hljs-string">&quot;/user&quot;</span>)<br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserController</span> </span>&#123;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> SysUserDao sysUserDao;<br><br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> SysUserRoleDao sysUserRoleDao;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 用户表sys_user，用户角色对照表sys_user_role。数据初始化</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">//发送get请求进行数据添加：127.0.0.1:8081/user/init</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/init&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">initData</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">for</span> (int i = <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">6</span>; i++) &#123;<br>            <span class="hljs-comment">// 根据时间戳生成userId</span><br>            <span class="hljs-built_in">String</span> userId = <span class="hljs-built_in">String</span>.valueOf(System.currentTimeMillis());<br>            <span class="hljs-comment">// new出用户表和用户角色表的对象</span><br>            SysUser sysUser = <span class="hljs-keyword">new</span> SysUser();<br>            SysUserRole sysUserRole = <span class="hljs-keyword">new</span> SysUserRole();<br>            <span class="hljs-comment">// 新增用户表</span><br>            sysUser.setUserId(userId);<br>            sysUser.setUserName(<span class="hljs-string">&quot;username_num&quot;</span> + i);<br>            sysUser.setPassWord(<span class="hljs-string">&quot;password_num&quot;</span> + i);<br>            sysUser.setEmail(<span class="hljs-string">&quot;email_num&quot;</span> + i + <span class="hljs-string">&quot;@qq.com&quot;</span>);<br>            sysUser.setSalt(i + <span class="hljs-string">&quot;&quot;</span>);<br>            sysUser.setRegTime(<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>());<br>            sysUserDao.save(sysUser);<br><br>            <span class="hljs-comment">// 暂时规定小于3的，角色为1，新建用户角色表</span><br>            <span class="hljs-keyword">if</span> (i &lt; <span class="hljs-number">3</span>) &#123;<br>                sysUserRole.setId(i);<br>                sysUserRole.setUserId(userId);<br>                sysUserRole.setRoleId(<span class="hljs-number">1</span>);<br>                sysUserRoleDao.save(sysUserRole);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 大于3的，角色为2</span><br>                sysUserRole.setId(i);<br>                sysUserRole.setUserId(userId);<br>                sysUserRole.setRoleId(<span class="hljs-number">2</span>);<br>                sysUserRoleDao.save(sysUserRole);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;init data success&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 删除</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送get请求：127.0.0.1:8081/user/delete/1562486017644</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/delete/&#123;userId&#125;&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">deleteUser</span>(<span class="hljs-params"><span class="hljs-meta">@PathVariable</span>(<span class="hljs-string">&quot;userId&quot;</span>) <span class="hljs-built_in">String</span> userId</span>)</span> &#123;<br>        sysUserDao.deleteByUserId(userId);<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;delete success&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 查询全部</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送get请求：127.0.0.1:8081/user/list</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/list&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> List&lt;SysUser&gt; <span class="hljs-function"><span class="hljs-title">getUsers</span>(<span class="hljs-params"></span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findAll();<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据id查询</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送get请求：127.0.0.1:8081/user/info/1562486017644</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/info/&#123;userId&#125;&quot;</span>, method = RequestMethod.GET)<br>    <span class="hljs-keyword">public</span> Optional&lt;SysUser&gt; <span class="hljs-function"><span class="hljs-title">getUserById</span>(<span class="hljs-params"><span class="hljs-meta">@PathVariable</span>(<span class="hljs-string">&quot;userId&quot;</span>) <span class="hljs-built_in">String</span> userId</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findByUserId(userId);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 更新</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送post请求：127.0.0.1:8081/user/update</span><br>    <span class="hljs-comment">// 发送报文体如下</span><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">     &#123;</span><br><span class="hljs-comment">        &quot;userId&quot;:&quot;1562486017551&quot;,</span><br><span class="hljs-comment">        &quot;passWord&quot;: &quot;231231231212312&quot;,</span><br><span class="hljs-comment">        &quot;userName&quot;:&quot;Tom&quot;,</span><br><span class="hljs-comment">        &quot;email&quot;: &quot;1111111@qq.com&quot;</span><br><span class="hljs-comment">     &#125;</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/update&quot;</span>, method = RequestMethod.POST)<br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">String</span> <span class="hljs-function"><span class="hljs-title">updateAccount</span>(<span class="hljs-params"><span class="hljs-meta">@RequestBody</span> HashMap&lt;<span class="hljs-built_in">String</span>, <span class="hljs-built_in">String</span>&gt; map</span>)</span> &#123;<br>        <span class="hljs-comment">// 根据Id更新用户信息</span><br>        sysUserDao.updateOne(<br>                map.get(<span class="hljs-string">&quot;email&quot;</span>),<br>                map.get(<span class="hljs-string">&quot;userName&quot;</span>),<br>                map.get(<span class="hljs-string">&quot;passWord&quot;</span>),<br>                map.get(<span class="hljs-string">&quot;userId&quot;</span>));<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;update success&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 关联查询用户的角色信息</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送post请求：127.0.0.1:8081/user/getUserRole</span><br>    <span class="hljs-comment">// 发送报文体如下</span><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      &#123;</span><br><span class="hljs-comment">         &quot;userId&quot;:&quot;1562486017629&quot;</span><br><span class="hljs-comment">      &#125;</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/getUserRole&quot;</span>, method = RequestMethod.POST)<br>    <span class="hljs-keyword">public</span> List&lt;SysUserInfo&gt; <span class="hljs-function"><span class="hljs-title">getUserRole</span>(<span class="hljs-params"><span class="hljs-meta">@RequestBody</span> HashMap&lt;<span class="hljs-built_in">String</span>, <span class="hljs-built_in">String</span>&gt; map</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findUserRole(map.get(<span class="hljs-string">&quot;userId&quot;</span>));<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据非主键username模糊查询</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-comment">// 发送post请求：127.0.0.1:8081/user/getUserByUserName</span><br>    <span class="hljs-comment">// 发送报文体如下</span><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">    &#123;</span><br><span class="hljs-comment">        &quot;userName&quot;:&quot;username&quot;</span><br><span class="hljs-comment">    &#125;</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@RequestMapping</span>(value = <span class="hljs-string">&quot;/getUserByUserName&quot;</span>, method = RequestMethod.POST)<br>    <span class="hljs-keyword">public</span> List&lt;SysUser&gt; <span class="hljs-function"><span class="hljs-title">getUserByUserName</span>(<span class="hljs-params"><span class="hljs-meta">@RequestBody</span> HashMap&lt;<span class="hljs-built_in">String</span>, <span class="hljs-built_in">String</span>&gt; map</span>)</span> &#123;<br>        <span class="hljs-keyword">return</span> sysUserDao.findUserName(map.get(<span class="hljs-string">&quot;userName&quot;</span>));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>代码有点多，只是我写的例子多了点</p>
-<h3 id="6、补充Dao"><a href="#6、补充Dao" class="headerlink" title="6、补充Dao"></a>6、补充Dao</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> SysUserDao <span class="hljs-keyword">extends</span> JpaRepository&lt;SysUser, Integer&gt; &#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据userId删除数据</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;delete u from sys_user u where u.user_id = ?1&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    <span class="hljs-meta">@Modifying</span><br>    <span class="hljs-built_in">void</span> deleteByUserId(<span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据UserId查询</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param <span class="hljs-variable">userId</span></span></span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;select u.* from sys_user u where u.user_id = ?1&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    Optional&lt;SysUser&gt; findByUserId(<span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据Id更新用户相关信息</span><br><span class="hljs-comment">     * nativeQuery = true 添加该属性等于true则是原生SQL语句查询，不添加则是HQL语句</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;update  sys_user set email=?1, user_name=?2, pass_word=?3 where user_id=?4&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    <span class="hljs-meta">@Modifying</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> updateOne(<span class="hljs-built_in">String</span> email, <span class="hljs-built_in">String</span> userName, <span class="hljs-built_in">String</span> passWord, <span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 查询用户角色</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param <span class="hljs-variable">userId</span></span></span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;SELECT &quot;</span> +<br>            <span class="hljs-string">&quot;t.user_id AS userId, &quot;</span> +<br>            <span class="hljs-string">&quot;t.user_name AS userName, &quot;</span> +<br>            <span class="hljs-string">&quot;t.email AS email, &quot;</span> +<br>            <span class="hljs-string">&quot;t.pass_word AS passWord, &quot;</span> +<br>            <span class="hljs-string">&quot;r.role_id AS roleId &quot;</span> +<br>            <span class="hljs-string">&quot;FROM sys_user t LEFT JOIN sys_user_role r &quot;</span> +<br>            <span class="hljs-string">&quot;ON r.user_id = t.user_id &quot;</span> +<br>            <span class="hljs-string">&quot;WHERE t.user_id = ?1&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    List&lt;SysUserInfo&gt; findUserRole(<span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据username查询用户信息</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;select u.* from sys_user u where u.user_name like CONCAT(&#x27;%&#x27;,?1,&#x27;%&#x27;)&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    List&lt;SysUser&gt; findUserName(<span class="hljs-built_in">String</span> nickName);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="6、补充Dao"><a href="#6、补充Dao" class="headerlink" title="6、补充Dao"></a>6、补充Dao</h3><figure class="highlight typescript"><table><tr><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> SysUserDao <span class="hljs-keyword">extends</span> JpaRepository&lt;SysUser, Integer&gt; &#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据userId删除数据</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;delete u from sys_user u where u.user_id = ?1&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    <span class="hljs-meta">@Modifying</span><br>    <span class="hljs-built_in">void</span> deleteByUserId(<span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据UserId查询</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param <span class="hljs-variable">userId</span></span></span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;select u.* from sys_user u where u.user_id = ?1&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    Optional&lt;SysUser&gt; findByUserId(<span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据Id更新用户相关信息</span><br><span class="hljs-comment">     * nativeQuery = true 添加该属性等于true则是原生SQL语句查询，不添加则是HQL语句</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Transactional</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;update  sys_user set email=?1, user_name=?2, pass_word=?3 where user_id=?4&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    <span class="hljs-meta">@Modifying</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> updateOne(<span class="hljs-built_in">String</span> email, <span class="hljs-built_in">String</span> userName, <span class="hljs-built_in">String</span> passWord, <span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 查询用户角色</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param <span class="hljs-variable">userId</span></span></span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;SELECT &quot;</span> +<br>            <span class="hljs-string">&quot;t.user_id AS userId, &quot;</span> +<br>            <span class="hljs-string">&quot;t.user_name AS userName, &quot;</span> +<br>            <span class="hljs-string">&quot;t.email AS email, &quot;</span> +<br>            <span class="hljs-string">&quot;t.pass_word AS passWord, &quot;</span> +<br>            <span class="hljs-string">&quot;r.role_id AS roleId &quot;</span> +<br>            <span class="hljs-string">&quot;FROM sys_user t LEFT JOIN sys_user_role r &quot;</span> +<br>            <span class="hljs-string">&quot;ON r.user_id = t.user_id &quot;</span> +<br>            <span class="hljs-string">&quot;WHERE t.user_id = ?1&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    List&lt;SysUserInfo&gt; findUserRole(<span class="hljs-built_in">String</span> userId);<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 根据username查询用户信息</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span></span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Query</span>(value = <span class="hljs-string">&quot;select u.* from sys_user u where u.user_name like CONCAT(&#x27;%&#x27;,?1,&#x27;%&#x27;)&quot;</span>, nativeQuery = <span class="hljs-literal">true</span>)<br>    List&lt;SysUser&gt; findUserName(<span class="hljs-built_in">String</span> nickName);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>这里需要注意的在<code>findUserRole</code>方法，是联表查询，其结果集在<code>SysUserInfo</code>中</p>
-<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-keyword">public</span> interface SysUserInfo &#123;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getUserId</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getUserName</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getEmail</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getPassWord</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">getRoleId</span><span class="hljs-params">()</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><code class="hljs arduino"><span class="hljs-keyword">public</span> interface SysUserInfo &#123;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getUserId</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getUserName</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getEmail</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">String</span> <span class="hljs-title">getPassWord</span><span class="hljs-params">()</span></span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">getRoleId</span><span class="hljs-params">()</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="二、测试"><a href="#二、测试" class="headerlink" title="二、测试"></a>二、测试</h2><p>启动项目之前，将<code>spring.jpa.hibernate.ddl-auto</code>改为<code>create</code>。启动完成之后改为update或者none。</p>
 <p>会生成两张表sys_user用户表，sys_user_role用户角色对应表</p>
@@ -297,342 +196,149 @@
 <p>我在网上也搜索了，有些人会建议将Jpa和Mybatis结合使用。我也感觉这点子不错。后续会继续研究</p>
 <h2 id="四、源码"><a href="#四、源码" class="headerlink" title="四、源码"></a>四、源码</h2><p>github源码地址：<a target="_blank" rel="noopener" href="https://github.com/niaobulashi/spring-boot-learning/tree/master/spring-boot-18-jpa02">Spring Boot2(九)：整合Jpa的基本使用</a></p>
 <p>To be continued…</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">鸟不拉诗</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://niaobulashi.com/2019/07/07/2019-07-07-springboot-jpa/">https://niaobulashi.com/2019/07/07/2019-07-07-springboot-jpa/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://niaobulashi.com" target="_blank">鸟不拉诗</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/SpringBoot/">SpringBoot</a></div><div class="post_share"><div class="social-share" data-image="https://images.niaobulashi.com/hexo/niaobulashi/2019/jpa.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2019/07/08/2019-07-08-springboot-rabbitMQ/"><img class="prev-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2020/RabbitMQ.jpeg" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Spring Boot2(十)：RabbitMQ 详解</div></div></a></div><div class="next-post pull-right"><a href="/2019/07/07/2019-07-07-banner/"><img class="next-cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2019/banner.png" onerror="onerror=null;src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Spring Boot2(八)：性感banner，在线发牌</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2019/06/26/2019-06-26-mybatis-hello/" title="Spring Boot2(一)：使用Spring Boot2集成Mybatis基础搭建"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2019/hello-fb-logo.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-06-26</div><div class="title">Spring Boot2(一)：使用Spring Boot2集成Mybatis基础搭建</div></div></a></div><div><a href="/2019/06/28/2019-06-28-mybatis-2levelcache/" title="Spring Boot2(二)：使用Spring Boot2集成Mybatis缓存机制"><img class="cover" src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018a/f480ac76.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-06-28</div><div class="title">Spring Boot2(二)：使用Spring Boot2集成Mybatis缓存机制</div></div></a></div><div><a href="/2019/06/28/2019-06-28-myproject-niaobulashi/" title="Spring Boot2版的权限管理系统"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2019/e52e184ead84f2792a15605f033c1141_20190325180243.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-06-28</div><div class="title">Spring Boot2版的权限管理系统</div></div></a></div><div><a href="/2019/06/30/2019-06-30-spring-boot-redis/" title="Spring Boot2(三)：使用Spring Boot2集成Redis缓存"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2019/banner-1544x500.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-06-30</div><div class="title">Spring Boot2(三)：使用Spring Boot2集成Redis缓存</div></div></a></div><div><a href="/2019/07/04/2019-07-04-aop/" title="Spring Boot2(六)：使用Spring Boot整合AOP面向切面编程"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2019/0_ho3_KlXbhhK_OBck.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-07-04</div><div class="title">Spring Boot2(六)：使用Spring Boot整合AOP面向切面编程</div></div></a></div><div><a href="/2019/07/06/2019-07-06-filter-interceptor/" title="Spring Boot2(七)：过滤器拦截器的使用"><img class="cover" src="https://images.niaobulashi.com/hexo/niaobulashi/2019/2020111716545949211.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-07-06</div><div class="title">Spring Boot2(七)：过滤器拦截器的使用</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/favicon.ico" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/friend_404.gif'" alt="avatar"/><div class="author-info__name">鸟不拉诗</div><div class="author-info__description">品味生活，分享技术</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">136</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">26</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/niaobulashi" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:hulang6666@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E4%BB%A3%E7%A0%81%E9%83%A8%E7%BD%B2"><span class="toc-number">1.</span> <span class="toc-text">一、代码部署</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E6%B7%BB%E5%8A%A0Maven%E4%BE%9D%E8%B5%96"><span class="toc-number">1.1.</span> <span class="toc-text">1、添加Maven依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E9%85%8D%E7%BD%AEapplication"><span class="toc-number">1.2.</span> <span class="toc-text">2、配置application</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E5%88%9B%E5%BB%BA%E5%AE%9E%E4%BD%93%E7%B1%BB"><span class="toc-number">1.3.</span> <span class="toc-text">3、创建实体类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81Dao%E5%B1%82"><span class="toc-number">1.4.</span> <span class="toc-text">4、Dao层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81Controller%E5%B1%82"><span class="toc-number">1.5.</span> <span class="toc-text">5、Controller层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6%E3%80%81%E8%A1%A5%E5%85%85Dao"><span class="toc-number">1.6.</span> <span class="toc-text">6、补充Dao</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%B5%8B%E8%AF%95"><span class="toc-number">2.</span> <span class="toc-text">二、测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">三、总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%BA%90%E7%A0%81"><span class="toc-number">4.</span> <span class="toc-text">四、源码</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询"><img src="https://images.niaobulashi.com/hexo/niaobulashi/2019/wuyi.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="假期余额查询"/></a><div class="content"><a class="title" href="/2021/04/30/2021-04-30-May-Day/" title="假期余额查询">假期余额查询</a><time datetime="2021-04-30T03:12:10.000Z" title="发表于 2021-04-30 11:12:10">2021-04-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/20210429103507.webp" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="下班去大雁塔溜达"/></a><div class="content"><a class="title" href="/2021/04/29/2021-04-29-xia-ban-qu-da-tang/" title="下班去大雁塔溜达">下班去大雁塔溜达</a><time datetime="2021-04-29T02:24:30.000Z" title="发表于 2021-04-29 10:24:30">2021-04-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/11196_P_1468653768970.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="秒杀业务方案思路"/></a><div class="content"><a class="title" href="/2021/04/28/2021-04-28-miao-sha-ye-wu/" title="秒杀业务方案思路">秒杀业务方案思路</a><time datetime="2021-04-28T06:24:30.000Z" title="发表于 2021-04-28 14:24:30">2021-04-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="逛一逛大唐芙蓉园"/></a><div class="content"><a class="title" href="/2021/04/26/2021-04-26-lotus-palace-of-tang-dynasty/" title="逛一逛大唐芙蓉园">逛一逛大唐芙蓉园</a><time datetime="2021-04-26T04:40:30.000Z" title="发表于 2021-04-26 12:40:30">2021-04-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗"><img src="https://images.niaobulashi.com/hexo/niaobulashi/202104/45461931fa6a4133920f84f7271d262e.jpeg" onerror="this.onerror=null;this.src='https://images.niaobulashi.com/hexo/niaobulashi/butterfly/404.jpg'" alt="我国适龄儿童可免费接种15种疫苗"/></a><div class="content"><a class="title" href="/2021/04/25/2021-04-25-child-yimiao/" title="我国适龄儿童可免费接种15种疫苗">我国适龄儿童可免费接种15种疫苗</a><time datetime="2021-04-25T03:33:30.000Z" title="发表于 2021-04-25 11:33:30">2021-04-25</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By 鸟不拉诗</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="rightside.chat_btn"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                  <div class="post-meta mr-3">
-                    <i class="iconfont icon-category"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/">程序笔记</a>
-                    
-                  </div>
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/SpringBoot/">SpringBoot</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/07/07/2019-07-07-banner/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Spring Boot2(八)：性感banner，在线发牌</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2019/07/06/2019-07-06-filter-interceptor/">
-                        <span class="hidden-mobile">Spring Boot2(七)：过滤器拦截器的使用</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
-                
-                  
-                
-                
-  <div id="valine"></div>
-  <script type="text/javascript">
-    Fluid.utils.lazyComments('valine', function() {
-      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
-        new Valine({
-          el: "#valine",
-          app_id: "y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz",
-          app_key: "WsdLwIB6AC0kk3T7hHhFJPO2",
-          placeholder: "说点什么~",
-          path: window.location.pathname,
-          avatar: "retro",
-          meta: ["nick","mail","link"],
-          pageSize: "10",
-          lang: "zh-CN",
-          highlight: false,
-          recordIP: false,
-          serverURLs: "",
-        });
-      });
-    });
-  </script>
-  <noscript>Please enable JavaScript to view the
-    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
-  </noscript>
+document.addEventListener('DOMContentLoaded', panguInit)</script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
 
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'y27RpKGa6HN1vN2bvj3wFXaT-gzGzoHsz',
+      appKey: 'WsdLwIB6AC0kk3T7hHhFJPO2',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+      requiredFields: ["nick,mail"],
+      visitor: false
+    }, null))
+  }
 
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
 
-      </div>
-    
-  </div>
-</div>
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-heart.min.js" async="async" mobile="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
 
-<!-- Custom -->
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
 
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"]):not([href="/music/"]):not([href="/no-pjax/"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: true,
+  scrollRestoration: false
+})
 
-    
+document.addEventListener('pjax:send', function () {
 
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
+  // removeEventListener toc scroll 
+  window.removeEventListener('scroll', window.tocScrollFn)
 
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-      <div class="col-lg-7 mx-auto nopadding-x-md">
-        <div class="container custom mx-auto">
-           <script src="/js/sidecar.v1.js" async defer></script> <script> ((window.gitter = {}).chat = {}).options = { room: "niaobulashi/Lobby" }; </script> 
-        </div>
-      </div>
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <i class="iconfont icon-love"></i> <a href="https://niaobulashi.com/atom" target="_blank" rel="nofollow noopener"><span>SSR</span></a> <i class="iconfont icon-love"></i> <a href="https://www.upyun.com/" rel="external nofollow" target="_blank"><img style="vertical-align:middle" src="https://images.niaobulashi.com/hexo/niaobulashi/fluid/source/img/yun_logo6.png" class="lazyload"></a> 
-  </div>
+  typeof preloader === 'object' && preloader.initLoading()
   
-  <div class="statistics">
-    
-    
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
 
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
+  typeof typed === 'object' && typed.destroy()
 
-    
-  </div>
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
 
+})
 
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        鄂ICP备17026246号-1
-      </a>
-    </span>
-    
-  </div>
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
 
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
 
-  
-</footer>
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
 
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
 
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+  // google analytics
+  typeof gtag === 'function' && gtag('config', 'G-5VCD453CKL', {'page_path': window.location.pathname});
 
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
 
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
 
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
 
-<!-- Plugins -->
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
 
+  typeof preloader === 'object' && preloader.endLoading()
+})
 
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?ffb42684ee1a6179af94ba8bc1920e42";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-5VCD453CKL', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VCD453CKL"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5VCD453CKL');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-</body>
-</html>
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
