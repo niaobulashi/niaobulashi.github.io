@@ -6,3 +6,7 @@ svg.icon {
    fill: currentColor;
    overflow: hidden;
 }
+
+#toggle-sidebar {
+  bottom: 80px
+}
