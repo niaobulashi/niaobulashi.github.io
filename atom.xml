@@ -6,7 +6,7 @@
   <link href="https://niaobulashi.com/atom.xml" rel="self"/>
   
   <link href="https://niaobulashi.com/"/>
-  <updated>2021-05-10T02:29:29.892Z</updated>
+  <updated>2021-05-10T02:49:11.286Z</updated>
   <id>https://niaobulashi.com/</id>
   
   <author>
@@ -17,23 +17,27 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title></title>
+    <title>DDD领域驱动设计详解</title>
     <link href="https://niaobulashi.com/2021/05/10/2021-05-10-DDD-xue-xi/"/>
     <id>https://niaobulashi.com/2021/05/10/2021-05-10-DDD-xue-xi/</id>
-    <published>2021-05-10T02:16:19.236Z</published>
-    <updated>2021-05-10T02:29:29.892Z</updated>
+    <published>2021-05-10T03:30:10.000Z</published>
+    <updated>2021-05-10T02:49:11.286Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;p&gt;title: DDD领域驱动设计详解&lt;br&gt;tags: [领域驱动设计]&lt;br&gt;date: 2021-05-10 11:30:10&lt;br&gt;categories: [工作笔记]&lt;br&gt;index_img: &lt;a</summary>
+    <summary type="html">&lt;h1 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot;</summary>
         
       
     
     
     
+    <category term="工作笔记" scheme="https://niaobulashi.com/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="领域驱动设计" scheme="https://niaobulashi.com/tags/%E9%A2%86%E5%9F%9F%E9%A9%B1%E5%8A%A8%E8%AE%BE%E8%AE%A1/"/>
     
   </entry>
   
