@@ -6,7 +6,7 @@
   <link href="https://niaobulashi.com/atom.xml" rel="self"/>
   
   <link href="https://niaobulashi.com/"/>
-  <updated>2021-05-18T09:51:12.802Z</updated>
+  <updated>2021-05-20T02:50:42.823Z</updated>
   <id>https://niaobulashi.com/</id>
   
   <author>
@@ -17,11 +17,39 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>switch 生化危机启示录2 通关测评</title>
+    <link href="https://niaobulashi.com/2021/05/20/2021-05-20-Resident-Evil-Revelations-2/"/>
+    <id>https://niaobulashi.com/2021/05/20/2021-05-20-Resident-Evil-Revelations-2/</id>
+    <published>2021-05-20T03:30:10.000Z</published>
+    <updated>2021-05-20T02:50:42.823Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;游戏名称：生化危机 启示录2&lt;br&gt;英文名称：Resident Evil Revelations 2&lt;br&gt;游戏类型：动作冒险&lt;br&gt;游戏制作：卡普空&lt;br&gt;游戏发行：卡普空&lt;br&gt;游戏平台：Nintendo</summary>
+        
+      
+    
+    
+    
+    <category term="游戏娱乐" scheme="https://niaobulashi.com/categories/%E6%B8%B8%E6%88%8F%E5%A8%B1%E4%B9%90/"/>
+    
+    
+    <category term="switch" scheme="https://niaobulashi.com/tags/switch/"/>
+    
+    <category term="生化危机启示录2" scheme="https://niaobulashi.com/tags/%E7%94%9F%E5%8C%96%E5%8D%B1%E6%9C%BA%E5%90%AF%E7%A4%BA%E5%BD%952/"/>
+    
+  </entry>
+  
+  <entry>
     <title>基于 Butterfly 的外挂标签引入-笔记</title>
     <link href="https://niaobulashi.com/2021/05/17/2021-05-17-butterfly-tag-plugins-plus/"/>
     <id>https://niaobulashi.com/2021/05/17/2021-05-17-butterfly-tag-plugins-plus/</id>
     <published>2021-05-17T03:30:10.000Z</published>
-    <updated>2021-05-18T09:51:12.802Z</updated>
+    <updated>2021-05-20T02:20:37.344Z</updated>
     
     
       
@@ -525,32 +553,6 @@
     
     
     <category term="家族信托" scheme="https://niaobulashi.com/tags/%E5%AE%B6%E6%97%8F%E4%BF%A1%E6%89%98/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>团队如何进行CodeReview</title>
-    <link href="https://niaobulashi.com/2020/12/14/2020-12-14-how-to-codereview/"/>
-    <id>https://niaobulashi.com/2020/12/14/2020-12-14-how-to-codereview/</id>
-    <published>2020-12-13T16:00:00.000Z</published>
-    <updated>2021-04-30T02:54:59.654Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;很多公司都要求项目做CodeReview，但很多项目第一次组织CodeReview往往不知道该如何做，也不知道为什么去做。&lt;/p&gt;
-&lt;p&gt;&lt;img</summary>
-        
-      
-    
-    
-    
-    <category term="工作笔记" scheme="https://niaobulashi.com/categories/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/"/>
-    
-    
-    <category term="团队" scheme="https://niaobulashi.com/tags/%E5%9B%A2%E9%98%9F/"/>
     
   </entry>
   
