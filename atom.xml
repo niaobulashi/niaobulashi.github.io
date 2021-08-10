@@ -6,7 +6,7 @@
   <link href="https://niaobulashi.com/atom.xml" rel="self"/>
   
   <link href="https://niaobulashi.com/"/>
-  <updated>2021-07-05T02:37:23.161Z</updated>
+  <updated>2021-08-10T03:31:42.871Z</updated>
   <id>https://niaobulashi.com/</id>
   
   <author>
@@ -15,6 +15,63 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL 大批量插入，如何过滤掉重复数据</title>
+    <link href="https://niaobulashi.com/2021/08/10/2021-08-10-Mysql-delete-repeat-fast/"/>
+    <id>https://niaobulashi.com/2021/08/10/2021-08-10-Mysql-delete-repeat-fast/</id>
+    <published>2021-08-10T03:30:10.000Z</published>
+    <updated>2021-08-10T03:31:42.871Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;线上库有6个表存在重复数据，其中2个表比较大，一个96万+、一个30万+，因为之前处理过相同的问题，就直接拿来了上次的Python去重脚本，脚本很简单，就是连接数据库，查出来重复数据，循环删除。&lt;/p&gt;
+&lt;p&gt;emmmm，但是这个效率嘛，实在是太低了，1秒一条，重复数据大约</summary>
+        
+      
+    
+    
+    
+    <category term="程序笔记" scheme="https://niaobulashi.com/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="Mysql" scheme="https://niaobulashi.com/tags/Mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java核心知识点整理</title>
+    <link href="https://niaobulashi.com/2021/07/07/2021-07-07-Java-Core-knowledge-points/"/>
+    <id>https://niaobulashi.com/2021/07/07/2021-07-07-Java-Core-knowledge-points/</id>
+    <published>2021-07-07T03:30:10.000Z</published>
+    <updated>2021-07-07T02:17:09.678Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;div class=&quot;tip &quot;&gt;&lt;p&gt;&lt;strong&gt;Java核心知识点整理&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+
+
+	&lt;div class=&quot;row&quot;&gt;
+    &lt;embed</summary>
+        
+      
+    
+    
+    
+    <category term="程序笔记" scheme="https://niaobulashi.com/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="Java" scheme="https://niaobulashi.com/tags/Java/"/>
+    
+  </entry>
   
   <entry>
     <title>燃脂健身教学视频</title>
@@ -498,59 +555,6 @@
 &lt;p&gt;那些熟悉的街道都变了模样&lt;/p&gt;
 &lt;p&gt;有些东西在时代更迭里弄丢了&lt;/p&gt;
 &lt;p&gt;有些事情在</summary>
-        
-      
-    
-    
-    
-    <category term="生活随笔" scheme="https://niaobulashi.com/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
-    
-    
-    <category term="Life" scheme="https://niaobulashi.com/tags/Life/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>五一回家一票难求哇</title>
-    <link href="https://niaobulashi.com/2021/04/21/2021-04-21-wu-yi-hui-jia-piao-nan-mai/"/>
-    <id>https://niaobulashi.com/2021/04/21/2021-04-21-wu-yi-hui-jia-piao-nan-mai/</id>
-    <published>2021-04-21T05:40:30.000Z</published>
-    <updated>2021-04-30T01:31:54.419Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;啊啊啊啊，五一来回的票到现在都还没搞定&lt;br&gt;五一都这么难抢，更别说国庆了😭。&lt;/p&gt;
-&lt;p&gt;想回去吃家里的饭菜，实在想回去啊。&lt;/p&gt;
-&lt;p&gt;刷吧，刷票吧&lt;br&gt;&lt;img</summary>
-        
-      
-    
-    
-    
-    <category term="生活随笔" scheme="https://niaobulashi.com/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
-    
-    
-    <category term="Life" scheme="https://niaobulashi.com/tags/Life/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>中科院博士论文走红网络——《致谢》</title>
-    <link href="https://niaobulashi.com/2021/04/20/2021-04-20-zhi-xie/"/>
-    <id>https://niaobulashi.com/2021/04/20/2021-04-20-zhi-xie/</id>
-    <published>2021-04-20T01:27:30.000Z</published>
-    <updated>2021-04-30T01:31:54.428Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;他的世界本无光，他把自己活成了光。&lt;/p&gt;
-&lt;p&gt;看前面他对自己经历的描述，更多的是感慨与钦佩。看到最后那几句“理想不伟大，只愿年过半百，归来仍是少年，希望还有机会重新认识这个世界，不辜负这一生吃过的苦。最后如果还能做出点让别人生活更美好的事，那这辈子就赚了。”真心敬仰。&lt;</summary>
         
       
     
