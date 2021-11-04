@@ -6,7 +6,7 @@
   <link href="https://niaobulashi.com/atom.xml" rel="self"/>
   
   <link href="https://niaobulashi.com/"/>
-  <updated>2021-09-22T03:02:14.374Z</updated>
+  <updated>2021-11-04T03:16:38.661Z</updated>
   <id>https://niaobulashi.com/</id>
   
   <author>
@@ -15,6 +15,37 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java相关一些面试题</title>
+    <link href="https://niaobulashi.com/2021/11/04/2021-11-04-java-Interview-questions/"/>
+    <id>https://niaobulashi.com/2021/11/04/2021-11-04-java-Interview-questions/</id>
+    <published>2021-11-04T04:30:10.000Z</published>
+    <updated>2021-11-04T03:16:38.661Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;ol&gt;
+&lt;li&gt;junit 用法，before,beforeClass,after, afterClass 的执行顺序&lt;/li&gt;
+&lt;li&gt;分布式锁&lt;/li&gt;
+&lt;li&gt;nginx 的请求转发算法，如何配置根据权重转发&lt;/li&gt;
+&lt;li&gt;用 hashmap 实现 redis</summary>
+        
+      
+    
+    
+    
+    <category term="程序笔记" scheme="https://niaobulashi.com/categories/%E7%A8%8B%E5%BA%8F%E7%AC%94%E8%AE%B0/"/>
+    
+    
+    <category term="Java" scheme="https://niaobulashi.com/tags/Java/"/>
+    
+    <category term="面试" scheme="https://niaobulashi.com/tags/%E9%9D%A2%E8%AF%95/"/>
+    
+  </entry>
   
   <entry>
     <title>中秋佳节 干饭逛街</title>
@@ -521,33 +552,6 @@
 &lt;p&gt;关键是那时候门票1百多，这时候门票50，就不请自来了😂&lt;/p&gt;
 &lt;p&gt;达到大唐芙蓉园地铁站就很有特色了，壁画映入眼帘&lt;/p&gt;
 &lt;div</summary>
-        
-      
-    
-    
-    
-    <category term="生活随笔" scheme="https://niaobulashi.com/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E7%AC%94/"/>
-    
-    
-    <category term="Life" scheme="https://niaobulashi.com/tags/Life/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>我国适龄儿童可免费接种15种疫苗</title>
-    <link href="https://niaobulashi.com/2021/04/25/2021-04-25-child-yimiao/"/>
-    <id>https://niaobulashi.com/2021/04/25/2021-04-25-child-yimiao/</id>
-    <published>2021-04-25T03:33:30.000Z</published>
-    <updated>2021-04-30T01:31:17.574Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;近日，国家卫健委公布《国家免疫规划疫苗儿童免疫程序及说明》，列出了部分疫苗剂次的接种起始年龄。今天，全国儿童预防接种日。一图看懂儿童接种疫苗时间↓&lt;/p&gt;
-&lt;p&gt;会用到的，记录一下。&lt;/p&gt;
-&lt;p&gt;&lt;img</summary>
         
       
     
